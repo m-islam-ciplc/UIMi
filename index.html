@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Console</title>
+    <link rel="stylesheet" href="uimi.css?v=ready2" />
+    <script>
+      document.documentElement.setAttribute(
+        "data-uimi-session",
+        localStorage.getItem("uimi-session") === "in" || sessionStorage.getItem("uimi-session") === "in" ? "in" : "out"
+      );
+    </script>
+  </head>
+  <body class="uimi-body">
+    <aside class="uimi-studio" aria-label="Design settings">
+      <p class="uimi-studio__label">Design</p>
+      <div class="uimi-shell-switch" role="group" aria-label="Navigation layout">
+        <button type="button" data-uimi-shell-choice="sidebar">Sidebar</button>
+        <button type="button" data-uimi-shell-choice="navbar">Navbar</button>
+      </div>
+      <label class="uimi-font-picker">
+        <span class="uimi-font-picker__label">Theme</span>
+        <select class="uimi-select uimi-select--compact" data-uimi-palette-select aria-label="Choose theme">
+          <option value="apricot">Apricot</option>
+          <option value="midnight">Midnight</option>
+          <option value="pastel">Pastel</option>
+        </select>
+      </label>
+      <label class="uimi-font-picker">
+        <span class="uimi-font-picker__label">UI</span>
+        <select class="uimi-select uimi-select--compact" data-uimi-font-select aria-label="Choose UI typeface">
+          <option value="inter">Inter</option>
+          <option value="cooper-hewitt">Cooper Hewitt</option>
+        </select>
+      </label>
+      <label class="uimi-font-picker">
+        <span class="uimi-font-picker__label">Headings</span>
+        <select class="uimi-select uimi-select--compact" data-uimi-display-select aria-label="Choose heading typeface">
+          <option value="inter">Inter</option>
+          <option value="cooper-hewitt">Cooper Hewitt</option>
+        </select>
+      </label>
+      <label class="uimi-font-picker">
+        <span class="uimi-font-picker__label">Usage</span>
+        <select class="uimi-select uimi-select--compact" data-uimi-stack-select aria-label="Choose framework">
+          <option value="html">HTML</option>
+          <option value="react">React</option>
+          <option value="vue">Vue</option>
+          <option value="svelte">Svelte</option>
+        </select>
+      </label>
+    </aside>
+    <div class="uimi-app">
+      <header class="uimi-navbar">
+        <a class="uimi-brand" href="#dashboard">
+          <span class="uimi-mark" aria-hidden="true"></span>
+          <span>
+            <strong>UIMi</strong>
+            <small>Workspace</small>
+          </span>
+        </a>
+        <nav class="uimi-nav uimi-navbar-links">
+          <details class="uimi-nav-sub">
+            <summary>Login</summary>
+            <div class="uimi-nav-flyout">
+              <a href="#login-1">Login 1</a>
+              <a href="#login-2">Login 2</a>
+            </div>
+          </details>
+          <details class="uimi-nav-sub">
+            <summary>Dashboard</summary>
+            <div class="uimi-nav-flyout">
+              <a href="#dashboard-1">Dashboard 1</a>
+              <a href="#dashboard-2">Dashboard 2</a>
+              <a href="#dashboard-3">Dashboard 3</a>
+            </div>
+          </details>
+          <details class="uimi-nav-sub">
+            <summary>Buttons</summary>
+            <div class="uimi-nav-flyout">
+              <a href="#buttons-1">Button 1</a>
+              <a href="#buttons-2">Button 2</a>
+              <a href="#buttons-3">Button 3</a>
+            </div>
+          </details>
+          <a href="#cards">Cards</a>
+          <a href="#tables">Tables</a>
+          <a href="#notifications">Notifications</a>
+          <a href="#badges">Badges</a>
+          <a href="#charts">Charts</a>
+          <a href="#forms">Forms</a>
+          <a href="#tabs">Tabs</a>
+        </nav>
+        <label class="uimi-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+          <input placeholder="Search accounts, invoices..." />
+        </label>
+        <div class="uimi-cluster">
+          <div class="uimi-notify">
+            <button class="uimi-icon-btn" type="button" data-uimi-notify-toggle aria-expanded="false" aria-label="Notifications">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 7 3 7H3s3 0 3-7"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+              <span class="uimi-notify-count">3</span>
+            </button>
+            <div class="uimi-notify-panel" hidden>
+              <div class="uimi-notify-head">
+                <strong>Notifications</strong>
+                <span class="uimi-badge uimi-badge--info">3 new</span>
+              </div>
+              <a class="uimi-notify-item" href="#tables">
+                <span class="uimi-dot" style="background:var(--uimi-success)"></span>
+                <span><strong>Invoice #2400 approved</strong><small>2 min ago</small></span>
+              </a>
+              <a class="uimi-notify-item" href="#tables">
+                <span class="uimi-dot"></span>
+                <span><strong>New order #1832412</strong><small>1 hr ago</small></span>
+              </a>
+              <a class="uimi-notify-item" href="#notifications">
+                <span class="uimi-dot" style="background:var(--uimi-warning)"></span>
+                <span><strong>Payment method updated</strong><small>Yesterday</small></span>
+              </a>
+            </div>
+          </div>
+          <span class="uimi-who" title="A. Rahman"><span class="uimi-avatar">AR</span><span class="uimi-who-name"> A. Rahman</span></span>
+          <button class="uimi-icon-btn uimi-signout" type="button" data-uimi-sign-out>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span class="uimi-sr-only">Sign out</span>
+          </button>
+          <button class="uimi-icon-btn uimi-menu" type="button" data-uimi-sidebar-toggle aria-label="Open menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+        </div>
+      </header>
+      <aside class="uimi-sidebar">
+        <a class="uimi-brand" href="#dashboard">
+          <span class="uimi-mark" aria-hidden="true"></span>
+          <span>
+            <strong>UIMi</strong>
+            <small>Workspace</small>
+          </span>
+        </a>
+        <nav class="uimi-nav uimi-sidenav" aria-label="Main">
+          <details class="uimi-nav-group uimi-nav-sub" open>
+            <summary>Login</summary>
+            <div class="uimi-nav-flyout">
+              <a href="#login-1">Login 1</a>
+              <a href="#login-2">Login 2</a>
+            </div>
+          </details>
+          <details class="uimi-nav-group uimi-nav-sub" open>
+            <summary>Dashboard</summary>
+            <div class="uimi-nav-flyout">
+              <a class="is-active" href="#dashboard-1">Dashboard 1</a>
+              <a href="#dashboard-2">Dashboard 2</a>
+              <a href="#dashboard-3">Dashboard 3</a>
+            </div>
+          </details>
+          <a href="#settings">Settings</a>
+          <details class="uimi-nav-group" open>
+            <summary>Components</summary>
+            <p class="uimi-nav-label">Actions</p>
+            <details class="uimi-nav-group uimi-nav-sub" open>
+              <summary>Buttons</summary>
+              <div class="uimi-nav-flyout">
+                <a href="#buttons-1">Button 1</a>
+                <a href="#buttons-2">Button 2</a>
+                <a href="#buttons-3">Button 3</a>
+              </div>
+            </details>
+            <a href="#cards">Cards</a>
+            <p class="uimi-nav-label">Data display</p>
+            <a href="#tables">Tables</a>
+            <a href="#charts">Charts</a>
+            <p class="uimi-nav-label">Feedback</p>
+            <a href="#notifications">Notifications</a>
+            <a href="#badges">Badges</a>
+            <p class="uimi-nav-label">Inputs</p>
+            <a href="#forms">Forms</a>
+            <p class="uimi-nav-label">Navigation</p>
+            <a href="#tabs">Tabs</a>
+          </details>
+        </nav>
+        <div class="uimi-help">
+          <h3>Need help?</h3>
+          <p>Support is available weekdays, 9:00–18:00. Typical reply time is under four hours.</p>
+          <button class="uimi-btn uimi-btn--primary uimi-btn--sm" type="button">Contact support</button>
+        </div>
+      </aside>
+
+      <main class="uimi-main">
+        <header class="uimi-topbar">
+          <div class="uimi-cluster">
+            <button class="uimi-icon-btn uimi-menu" type="button" data-uimi-sidebar-toggle aria-label="Open menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <label class="uimi-search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+              <input placeholder="Search accounts, invoices..." />
+            </label>
+          </div>
+          <div class="uimi-cluster">
+            <div class="uimi-notify">
+              <button class="uimi-icon-btn" type="button" data-uimi-notify-toggle aria-expanded="false" aria-label="Notifications">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 7 3 7H3s3 0 3-7"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+                <span class="uimi-notify-count">3</span>
+              </button>
+              <div class="uimi-notify-panel" hidden>
+                <div class="uimi-notify-head">
+                  <strong>Notifications</strong>
+                  <span class="uimi-badge uimi-badge--info">3 new</span>
+                </div>
+                <a class="uimi-notify-item" href="#tables">
+                  <span class="uimi-dot" style="background:var(--uimi-success)"></span>
+                  <span><strong>Invoice #2400 approved</strong><small>2 min ago</small></span>
+                </a>
+                <a class="uimi-notify-item" href="#tables">
+                  <span class="uimi-dot"></span>
+                  <span><strong>New order #1832412</strong><small>1 hr ago</small></span>
+                </a>
+                <a class="uimi-notify-item" href="#notifications">
+                  <span class="uimi-dot" style="background:var(--uimi-warning)"></span>
+                  <span><strong>Payment method updated</strong><small>Yesterday</small></span>
+                </a>
+              </div>
+            </div>
+            <span class="uimi-who"><span class="uimi-avatar">AR</span> A. Rahman</span>
+            <button class="uimi-icon-btn uimi-signout" type="button" data-uimi-sign-out>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span class="uimi-sr-only">Sign out</span>
+            </button>
+          </div>
+        </header>
+
+        <nav class="uimi-crumbs" aria-label="Breadcrumb">
+          <a href="#dashboard">Home</a>
+          <span data-uimi-crumb-group hidden>
+            <span class="uimi-crumbs-sep" aria-hidden="true">/</span>
+            <span data-uimi-crumb-parent>Components</span>
+          </span>
+          <span class="uimi-crumbs-sep" aria-hidden="true">/</span>
+          <span data-uimi-crumb>Dashboard</span>
+        </nav>
+
+        <section class="uimi-page" data-uimi-page="login-1" hidden>
+          <section class="uimi-auth uimi-auth--split">
+            <div class="uimi-auth-brand">
+              <p class="uimi-kicker">Access</p>
+              <h1 class="uimi-display">Sign in to continue</h1>
+              <p>Accounts, invoices, and delivery in one place. Use your work email to continue.</p>
+            </div>
+            <form class="uimi-auth-card" data-uimi-login>
+              <div class="uimi-auth-card-head">
+                <div>
+                  <p class="uimi-kicker" style="color:var(--uimi-primary)">Welcome back</p>
+                  <h2 class="uimi-display" style="font-size:26px;color:var(--uimi-ink)">Sign in</h2>
+                </div>
+              </div>
+              <p class="uimi-auth-msg" data-uimi-login-msg hidden></p>
+              <label class="uimi-field">
+                <span class="uimi-label">Work email</span>
+                <input class="uimi-input" name="email" type="email" autocomplete="username" value="you@company.com" required />
+              </label>
+              <label class="uimi-field">
+                <span class="uimi-label">Password</span>
+                <input class="uimi-input" name="password" type="password" autocomplete="current-password" value="password" required />
+              </label>
+              <div class="uimi-auth-row">
+                <label class="uimi-check"><input type="checkbox" name="remember" checked /> Remember me</label>
+                <button class="uimi-link" type="button" data-uimi-forgot>Forgot password</button>
+              </div>
+              <button class="uimi-btn uimi-btn--primary" type="submit">Sign in</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="login-2" hidden>
+          <section class="uimi-auth uimi-auth--center">
+            <form class="uimi-auth-card uimi-card" data-uimi-login>
+              <div class="uimi-auth-card-head">
+                <div>
+                  <p class="uimi-kicker" style="color:var(--uimi-primary)">Welcome back</p>
+                  <h2 class="uimi-display" style="font-size:26px;color:var(--uimi-ink)">Sign in</h2>
+                </div>
+              </div>
+              <p class="uimi-muted" style="margin:0">Use your work email to continue.</p>
+              <p class="uimi-auth-msg" data-uimi-login-msg hidden></p>
+              <label class="uimi-field">
+                <span class="uimi-label">Work email</span>
+                <input class="uimi-input" name="email" type="email" autocomplete="username" value="you@company.com" required />
+              </label>
+              <label class="uimi-field">
+                <span class="uimi-label">Password</span>
+                <input class="uimi-input" name="password" type="password" autocomplete="current-password" value="password" required />
+              </label>
+              <div class="uimi-auth-row">
+                <label class="uimi-check"><input type="checkbox" name="remember" checked /> Remember me</label>
+                <button class="uimi-link" type="button" data-uimi-forgot>Forgot password</button>
+              </div>
+              <button class="uimi-btn uimi-btn--primary" type="submit">Sign in</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="dashboard-1">
+        <section class="uimi-card uimi-banner">
+          <p class="uimi-kicker">Overview</p>
+          <h1 class="uimi-display">Good afternoon, Amina</h1>
+          <p>Three invoices are waiting on approval and the Contoso migration is 10% complete. Review the pipeline before Friday’s finance meeting.</p>
+          <div class="uimi-cluster">
+            <a class="uimi-btn uimi-btn--white" href="#">Review invoices</a>
+            <a class="uimi-btn uimi-btn--on-dark" href="#">Open accounts</a>
+            <a class="uimi-btn uimi-btn--on-dark" href="#">View reports</a>
+          </div>
+        </section>
+
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Revenue</div>
+                <strong>$53,000</strong>
+                <span class="uimi-delta uimi-delta--up">+5.5% vs yesterday</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18V7m5 11V4m5 14V9m5 9V6"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Active accounts</div>
+                <strong>2,300</strong>
+                <span class="uimi-delta uimi-delta--up">+3% vs last week</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7.5" r="3.5"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16.5 4.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">New clients</div>
+                <strong>48</strong>
+                <span class="uimi-delta uimi-delta--down">-2% vs last quarter</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--warning">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="miter"><rect x="3" y="5" width="18" height="14" rx="0"/><path d="m3 8 9 6 9-6"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Pipeline</div>
+                <strong>$103,430</strong>
+                <span class="uimi-delta uimi-delta--up">+5% vs last month</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M7 16V8m5 8V4m5 12v-5"/></svg>
+              </div>
+            </div>
+          </article>
+
+          <article class="uimi-card uimi-col-7">
+            <div class="uimi-cluster" style="justify-content:space-between">
+              <div>
+                <h3>Revenue overview</h3>
+                <p class="uimi-muted" style="margin:3px 0 0">Year to date <strong class="uimi-delta uimi-delta--up">+12.4%</strong></p>
+              </div>
+              <span class="uimi-badge uimi-badge--info">Current</span>
+            </div>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="bar" data-uimi-chart-color="primary" data-uimi-chart-values="42,58,36,72,54,88,64,76,48,91,70,62" data-uimi-chart-labels="Q1,Q2,Q3,Q4"></div>
+          </article>
+
+          <article class="uimi-card uimi-col-5">
+            <h3>Delivery status</h3>
+            <p class="uimi-muted">Workstreams this quarter</p>
+            <div style="display:grid;gap:16px;margin-top:16px">
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Platform migration</span><strong>80%</strong></div>
+                <div class="uimi-progress uimi-progress--navy"><span style="width:80%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Client onboarding</span><strong>64%</strong></div>
+                <div class="uimi-progress"><span style="width:64%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Compliance review</span><strong>92%</strong></div>
+                <div class="uimi-progress uimi-progress--green"><span style="width:92%"></span></div>
+              </div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="dashboard-2" hidden>
+        <header class="uimi-page-head">
+          <p class="uimi-kicker">Overview</p>
+          <h1 class="uimi-display">Overview</h1>
+          <p>Accounts, delivery, and finance for this week.</p>
+        </header>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Revenue</div>
+                <strong>$53,000</strong>
+                <span class="uimi-delta uimi-delta--up">+5.5% vs yesterday</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18V7m5 11V4m5 14V9m5 9V6"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Active accounts</div>
+                <strong>2,300</strong>
+                <span class="uimi-delta uimi-delta--up">+3% vs last week</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7.5" r="3.5"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16.5 4.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">New clients</div>
+                <strong>48</strong>
+                <span class="uimi-delta uimi-delta--down">-2% vs last quarter</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--warning">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="miter"><rect x="3" y="5" width="18" height="14" rx="0"/><path d="m3 8 9 6 9-6"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-3">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Pipeline</div>
+                <strong>$103,430</strong>
+                <span class="uimi-delta uimi-delta--up">+5% vs last month</span>
+              </div>
+              <div class="uimi-iconbox uimi-iconbox--success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M7 16V8m5 8V4m5 12v-5"/></svg>
+              </div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-7">
+            <div class="uimi-cluster" style="justify-content:space-between">
+              <div>
+                <h3>Revenue overview</h3>
+                <p class="uimi-muted" style="margin:3px 0 0">Year to date <strong class="uimi-delta uimi-delta--up">+12.4%</strong></p>
+              </div>
+              <span class="uimi-badge uimi-badge--info">Current</span>
+            </div>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="stacked" data-uimi-chart-color="primary" data-uimi-chart-values="18,14,10,8,6,22,16,12,9,7,20,18,11,10,8,26,20,14,12,9" data-uimi-chart-labels="Q1,Q2,Q3,Q4" data-uimi-chart-series="Platform,Onboarding,Compliance,Support,Ops"></div>
+          </article>
+          <article class="uimi-card uimi-col-5">
+            <h3>Delivery status</h3>
+            <p class="uimi-muted">Workstreams this quarter</p>
+            <div style="display:grid;gap:16px;margin-top:16px">
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Platform migration</span><strong>80%</strong></div>
+                <div class="uimi-progress uimi-progress--navy"><span style="width:80%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Client onboarding</span><strong>64%</strong></div>
+                <div class="uimi-progress"><span style="width:64%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Compliance review</span><strong>92%</strong></div>
+                <div class="uimi-progress uimi-progress--green"><span style="width:92%"></span></div>
+              </div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="dashboard-3" hidden>
+        <header class="uimi-page-head">
+          <div class="uimi-cluster" style="justify-content:space-between;align-items:flex-end">
+            <div>
+              <p class="uimi-kicker">Today</p>
+              <h1 class="uimi-display">Work queue</h1>
+              <p>Invoices waiting on finance, plus recent activity.</p>
+            </div>
+            <div class="uimi-cluster">
+              <a class="uimi-btn uimi-btn--primary" href="#">Review invoices</a>
+              <a class="uimi-btn uimi-btn--ghost" href="#">View reports</a>
+            </div>
+          </div>
+        </header>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-6">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Waiting on finance</div>
+                <strong>3 invoices</strong>
+                <span class="uimi-muted">Northwind, Contoso, Acme</span>
+              </div>
+              <span class="uimi-badge uimi-badge--warn">In review</span>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-6">
+            <div class="uimi-stat">
+              <div>
+                <div class="uimi-muted">Delivery this week</div>
+                <strong>10%</strong>
+                <span class="uimi-delta uimi-delta--up">Contoso migration</span>
+              </div>
+              <span class="uimi-badge uimi-badge--info">Active</span>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-8">
+            <h3>Accounts</h3>
+            <p class="uimi-muted">Teams and completion in one grid</p>
+            <div class="uimi-table-wrap">
+              <table class="uimi-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>Team</th>
+                    <th>Budget</th>
+                    <th>Completion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">NW</span> Northwind ERP</span></td>
+                    <td>8</td>
+                    <td>$14,000</td>
+                    <td>
+                      <div class="uimi-progress uimi-progress--navy"><span style="width:60%"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">CT</span> Contoso migration</span></td>
+                    <td>5</td>
+                    <td>$3,000</td>
+                    <td>
+                      <div class="uimi-progress"><span style="width:10%"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">AC</span> Acme finance close</span></td>
+                    <td>12</td>
+                    <td>$20,500</td>
+                    <td>
+                      <div class="uimi-progress uimi-progress--green"><span style="width:100%"></span></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-4">
+            <h3>Activity</h3>
+            <p class="uimi-muted"><span class="uimi-delta uimi-delta--up">+8</span> updates this week</p>
+            <div class="uimi-timeline" style="margin-top:16px">
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-success)"></span>
+                <div>
+                  <strong>Invoice #2400 approved</strong>
+                  <div class="uimi-muted">22 Dec, 19:20</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot"></span>
+                <div>
+                  <strong>New order #1832412</strong>
+                  <div class="uimi-muted">21 Dec, 23:21</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-warning)"></span>
+                <div>
+                  <strong>Payment method updated</strong>
+                  <div class="uimi-muted">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="buttons-1" hidden>
+        <aside class="uimi-note" aria-label="Button 1">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Button 1</span></div>
+          <p>Rounded corners. Click a sample to copy it with the Design bar setup.</p>
+        </aside>
+        <section class="uimi-card">
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label" style="margin-top:16px">Solid</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--solid">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--solid">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--solid">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--solid">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--solid">Delete</button>
+            <button class="uimi-btn uimi-btn--solid">Archive</button>
+          </div>
+          <p class="uimi-label">Border</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--border">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--border">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--border">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--border">Delete</button>
+            <button class="uimi-btn uimi-btn--border">Archive</button>
+          </div>
+          <p class="uimi-label">Gradient</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--gradient">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--gradient">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--gradient">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--gradient">Delete</button>
+            <button class="uimi-btn uimi-btn--gradient">Archive</button>
+          </div>
+          <p class="uimi-label">Flip</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--flip">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--flip">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--flip">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--flip">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--flip">Delete</button>
+            <button class="uimi-btn uimi-btn--flip">Archive</button>
+          </div>
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary uimi-btn--flip"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label">Ghost</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--ghost">Cancel</button>
+          </div>
+          <p class="uimi-label">Sizes</p>
+          <div class="uimi-cluster" style="margin:8px 0 0">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--lg">Large</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border uimi-btn--md">Medium</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient uimi-btn--sm">Small</button>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="buttons-2" hidden>
+        <aside class="uimi-note" aria-label="Button 2">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Button 2</span></div>
+          <p>Square corners. Click a sample to copy it with the Design bar setup.</p>
+        </aside>
+        <section class="uimi-card" data-uimi-btn-shape="square">
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary uimi-btn--square"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label" style="margin-top:16px">Solid</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--solid uimi-btn--square">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--solid uimi-btn--square">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--solid uimi-btn--square">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--solid uimi-btn--square">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--solid uimi-btn--square">Delete</button>
+            <button class="uimi-btn uimi-btn--solid uimi-btn--square">Archive</button>
+          </div>
+          <p class="uimi-label">Border</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border uimi-btn--square">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--border uimi-btn--square">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--border uimi-btn--square">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--border uimi-btn--square">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--border uimi-btn--square">Delete</button>
+            <button class="uimi-btn uimi-btn--border uimi-btn--square">Archive</button>
+          </div>
+          <p class="uimi-label">Gradient</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient uimi-btn--square">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--gradient uimi-btn--square">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--gradient uimi-btn--square">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--gradient uimi-btn--square">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--gradient uimi-btn--square">Delete</button>
+            <button class="uimi-btn uimi-btn--gradient uimi-btn--square">Archive</button>
+          </div>
+          <p class="uimi-label">Flip</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--flip uimi-btn--square">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--flip uimi-btn--square">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--flip uimi-btn--square">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--flip uimi-btn--square">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--flip uimi-btn--square">Delete</button>
+            <button class="uimi-btn uimi-btn--flip uimi-btn--square">Archive</button>
+          </div>
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary uimi-btn--flip uimi-btn--square"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label">Ghost</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--square">Cancel</button>
+          </div>
+          <p class="uimi-label">Sizes</p>
+          <div class="uimi-cluster" style="margin:8px 0 0">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--lg uimi-btn--square">Large</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border uimi-btn--md uimi-btn--square">Medium</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient uimi-btn--sm uimi-btn--square">Small</button>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="buttons-3" hidden>
+        <aside class="uimi-note" aria-label="Button 3">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Button 3</span></div>
+          <p>Pill shape. Click a sample to copy it with the Design bar setup.</p>
+        </aside>
+        <section class="uimi-card" data-uimi-btn-shape="pill">
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary uimi-btn--pill"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label" style="margin-top:16px">Solid</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--solid uimi-btn--pill">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--solid uimi-btn--pill">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--solid uimi-btn--pill">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--solid uimi-btn--pill">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--solid uimi-btn--pill">Delete</button>
+            <button class="uimi-btn uimi-btn--solid uimi-btn--pill">Archive</button>
+          </div>
+          <p class="uimi-label">Border</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border uimi-btn--pill">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--border uimi-btn--pill">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--border uimi-btn--pill">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--border uimi-btn--pill">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--border uimi-btn--pill">Delete</button>
+            <button class="uimi-btn uimi-btn--border uimi-btn--pill">Archive</button>
+          </div>
+          <p class="uimi-label">Gradient</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient uimi-btn--pill">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--gradient uimi-btn--pill">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--gradient uimi-btn--pill">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--gradient uimi-btn--pill">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--gradient uimi-btn--pill">Delete</button>
+            <button class="uimi-btn uimi-btn--gradient uimi-btn--pill">Archive</button>
+          </div>
+          <p class="uimi-label">Flip</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--flip uimi-btn--pill">Save changes</button>
+            <button class="uimi-btn uimi-btn--info uimi-btn--flip uimi-btn--pill">Send invite</button>
+            <button class="uimi-btn uimi-btn--success uimi-btn--flip uimi-btn--pill">Approve</button>
+            <button class="uimi-btn uimi-btn--warning uimi-btn--flip uimi-btn--pill">Hold</button>
+            <button class="uimi-btn uimi-btn--danger uimi-btn--flip uimi-btn--pill">Delete</button>
+            <button class="uimi-btn uimi-btn--flip uimi-btn--pill">Archive</button>
+          </div>
+          <div class="uimi-snippet">
+            <pre class="uimi-code"><code>&lt;button class="uimi-btn uimi-btn--primary uimi-btn--flip uimi-btn--pill"&gt;Save changes&lt;/button&gt;</code></pre>
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+          </div>
+          <p class="uimi-label">Ghost</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <button class="uimi-btn uimi-btn--ghost uimi-btn--pill">Cancel</button>
+          </div>
+          <p class="uimi-label">Sizes</p>
+          <div class="uimi-cluster" style="margin:8px 0 0">
+            <button class="uimi-btn uimi-btn--primary uimi-btn--lg uimi-btn--pill">Large</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--border uimi-btn--md uimi-btn--pill">Medium</button>
+            <button class="uimi-btn uimi-btn--primary uimi-btn--gradient uimi-btn--sm uimi-btn--pill">Small</button>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="cards" hidden>
+        <aside class="uimi-note" aria-label="Cards">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Cards</span></div>
+          <p>Rounded, cut, square, or full width. Card fill follows the theme colors.</p>
+        </aside>
+        <section class="uimi-grid">
+          <div class="uimi-col-4">
+            <p class="uimi-label">Rounded</p>
+            <article class="uimi-card">
+              <div class="uimi-stat">
+                <div>
+                  <div class="uimi-muted">Revenue</div>
+                  <strong>$53,000</strong>
+                  <span class="uimi-delta uimi-delta--up">+5.5% vs yesterday</span>
+                </div>
+                <div class="uimi-iconbox uimi-iconbox--primary">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18V7m5 11V4m5 14V9m5 9V6"/></svg>
+                </div>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+          <div class="uimi-col-4">
+            <p class="uimi-label">Cut</p>
+            <article class="uimi-card" data-uimi-card-corner="cut">
+              <div class="uimi-stat">
+                <div>
+                  <div class="uimi-muted">Active accounts</div>
+                  <strong>2,300</strong>
+                  <span class="uimi-delta uimi-delta--up">+3% vs last week</span>
+                </div>
+                <div class="uimi-iconbox uimi-iconbox--info">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7.5" r="3.5"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16.5 4.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card" data-uimi-card-corner="cut"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+          <div class="uimi-col-4">
+            <p class="uimi-label">Square</p>
+            <article class="uimi-card" data-uimi-card-corner="square">
+              <div class="uimi-stat">
+                <div>
+                  <div class="uimi-muted">Pipeline</div>
+                  <strong>$103,430</strong>
+                  <span class="uimi-delta uimi-delta--up">+5% vs last month</span>
+                </div>
+                <div class="uimi-iconbox uimi-iconbox--success">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M7 16V8m5 8V4m5 12v-5"/></svg>
+                </div>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card" data-uimi-card-corner="square"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+          <div class="uimi-col-12">
+            <p class="uimi-label">Full width · Rounded</p>
+            <article class="uimi-card">
+              <div class="uimi-cluster" style="justify-content:space-between">
+                <div>
+                  <div class="uimi-muted">Northwind ERP</div>
+                  <strong>Business plan</strong>
+                  <span class="uimi-delta uimi-delta--up">60% complete this quarter</span>
+                </div>
+                <span class="uimi-badge uimi-badge--info">Active</span>
+              </div>
+              <p class="uimi-muted" style="margin:12px 0 0">Three invoices are waiting on finance. Completion is 60% this quarter.</p>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card uimi-col-12"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+          <div class="uimi-col-12">
+            <p class="uimi-label">Full width · Cut</p>
+            <article class="uimi-card" data-uimi-card-corner="cut">
+              <div class="uimi-cluster" style="justify-content:space-between">
+                <div>
+                  <div class="uimi-muted">Contoso Logistics</div>
+                  <strong>Fleet rollout</strong>
+                  <span class="uimi-delta uimi-delta--up">42% complete this quarter</span>
+                </div>
+                <span class="uimi-badge uimi-badge--warning">Review</span>
+              </div>
+              <p class="uimi-muted" style="margin:12px 0 0">Two depots still need drivers assigned. Completion is 42% this quarter.</p>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card uimi-col-12" data-uimi-card-corner="cut"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+          <div class="uimi-col-12">
+            <p class="uimi-label">Full width · Square</p>
+            <article class="uimi-card" data-uimi-card-corner="square">
+              <div class="uimi-cluster" style="justify-content:space-between">
+                <div>
+                  <div class="uimi-muted">Fabrikam Retail</div>
+                  <strong>Store refresh</strong>
+                  <span class="uimi-delta uimi-delta--up">78% complete this quarter</span>
+                </div>
+                <span class="uimi-badge uimi-badge--success">On track</span>
+              </div>
+              <p class="uimi-muted" style="margin:12px 0 0">One region is waiting on fixtures. Completion is 78% this quarter.</p>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;article class="uimi-card uimi-col-12" data-uimi-card-corner="square"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="tables" hidden>
+        <aside class="uimi-note" aria-label="Tables">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Tables</span></div>
+          <p>Accounts, teams, and completion in one grid. Freeze a header or a column when the grid scrolls.</p>
+        </aside>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-8">
+            <div class="uimi-table-wrap">
+              <table class="uimi-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>Team</th>
+                    <th>Budget</th>
+                    <th>Completion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">NW</span> Northwind ERP</span></td>
+                    <td>8</td>
+                    <td>$14,000</td>
+                    <td>
+                      <div class="uimi-progress uimi-progress--navy"><span style="width:60%"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">CT</span> Contoso migration</span></td>
+                    <td>5</td>
+                    <td>$3,000</td>
+                    <td>
+                      <div class="uimi-progress"><span style="width:10%"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">AC</span> Acme finance close</span></td>
+                    <td>12</td>
+                    <td>$20,500</td>
+                    <td>
+                      <div class="uimi-progress uimi-progress--green"><span style="width:100%"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="uimi-who"><span class="uimi-avatar">GL</span> Globex audit pack</span></td>
+                    <td>3</td>
+                    <td>$8,400</td>
+                    <td>
+                      <div class="uimi-progress"><span style="width:25%"></span></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <nav class="uimi-pager" data-uimi-pager aria-label="Pagination">
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" disabled>Previous</button>
+              <button class="uimi-pager-page is-active" type="button">1</button>
+              <button class="uimi-pager-page" type="button">2</button>
+              <button class="uimi-pager-page" type="button">3</button>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button">Next</button>
+            </nav>
+          </article>
+
+          <article class="uimi-card uimi-col-4">
+            <h3>Activity</h3>
+            <p class="uimi-muted"><span class="uimi-delta uimi-delta--up">+8</span> updates this week</p>
+            <div class="uimi-timeline" style="margin-top:16px">
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-success)"></span>
+                <div>
+                  <strong>Invoice #2400 approved</strong>
+                  <div class="uimi-muted">22 Dec, 19:20</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot"></span>
+                <div>
+                  <strong>New order #1832412</strong>
+                  <div class="uimi-muted">21 Dec, 23:21</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-info)"></span>
+                <div>
+                  <strong>April infrastructure payment</strong>
+                  <div class="uimi-muted">21 Dec, 21:28</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-warning)"></span>
+                <div>
+                  <strong>Payment method updated</strong>
+                  <div class="uimi-muted">20 Dec, 15:52</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="uimi-col-12">
+            <p class="uimi-label">Freeze header</p>
+            <article class="uimi-card">
+              <div class="uimi-table-wrap uimi-table-wrap--freeze-head">
+                <table class="uimi-table">
+                  <thead>
+                    <tr>
+                      <th>Account</th>
+                      <th>Team</th>
+                      <th>Budget</th>
+                      <th>Completion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Northwind ERP</td><td>8</td><td>$14,000</td><td>60%</td></tr>
+                    <tr><td>Contoso migration</td><td>5</td><td>$3,000</td><td>10%</td></tr>
+                    <tr><td>Acme finance close</td><td>12</td><td>$20,500</td><td>100%</td></tr>
+                    <tr><td>Globex audit pack</td><td>3</td><td>$8,400</td><td>25%</td></tr>
+                    <tr><td>Initech onboarding</td><td>6</td><td>$9,200</td><td>40%</td></tr>
+                    <tr><td>Hooli platform</td><td>15</td><td>$42,000</td><td>72%</td></tr>
+                    <tr><td>Pied Piper sync</td><td>4</td><td>$6,100</td><td>18%</td></tr>
+                    <tr><td>Soylent ledger</td><td>7</td><td>$11,800</td><td>55%</td></tr>
+                    <tr><td>Stark inventory</td><td>9</td><td>$27,400</td><td>88%</td></tr>
+                    <tr><td>Wayne security</td><td>11</td><td>$19,600</td><td>33%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;div class="uimi-table-wrap uimi-table-wrap--freeze-head"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+
+          <div class="uimi-col-12">
+            <p class="uimi-label">Freeze column</p>
+            <article class="uimi-card">
+              <div class="uimi-table-wrap uimi-table-wrap--freeze-col">
+                <table class="uimi-table">
+                  <thead>
+                    <tr>
+                      <th>Account</th>
+                      <th>Team</th>
+                      <th>Owner</th>
+                      <th>Region</th>
+                      <th>Stage</th>
+                      <th>Priority</th>
+                      <th>Budget</th>
+                      <th>Spent</th>
+                      <th>Remaining</th>
+                      <th>Forecast</th>
+                      <th>Start</th>
+                      <th>Due</th>
+                      <th>Updated</th>
+                      <th>Contact</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Northwind ERP</td><td>8</td><td>Maya Chen</td><td>North</td><td>Build</td><td>High</td><td>$14,000</td><td>$8,400</td><td>$5,600</td><td>$15,200</td><td>1 Aug</td><td>30 Sep</td><td>16 Sep</td><td>maya@northwind.io</td></tr>
+                    <tr><td>Contoso migration</td><td>5</td><td>Luis Ortega</td><td>West</td><td>Plan</td><td>Med</td><td>$3,000</td><td>$300</td><td>$2,700</td><td>$3,400</td><td>12 Aug</td><td>15 Oct</td><td>14 Sep</td><td>luis@contoso.com</td></tr>
+                    <tr><td>Acme finance close</td><td>12</td><td>Priya Shah</td><td>East</td><td>Close</td><td>High</td><td>$20,500</td><td>$20,500</td><td>$0</td><td>$20,500</td><td>1 Jul</td><td>12 Sep</td><td>12 Sep</td><td>priya@acme.co</td></tr>
+                    <tr><td>Globex audit pack</td><td>3</td><td>Jonah Hale</td><td>South</td><td>Review</td><td>Low</td><td>$8,400</td><td>$2,100</td><td>$6,300</td><td>$8,900</td><td>20 Aug</td><td>1 Nov</td><td>11 Sep</td><td>jonah@globex.com</td></tr>
+                    <tr><td>Initech onboarding</td><td>6</td><td>Asha Patel</td><td>North</td><td>Build</td><td>Med</td><td>$9,200</td><td>$3,680</td><td>$5,520</td><td>$9,800</td><td>5 Aug</td><td>20 Oct</td><td>10 Sep</td><td>asha@initech.com</td></tr>
+                    <tr><td>Hooli platform</td><td>15</td><td>Ken Miles</td><td>West</td><td>Scale</td><td>High</td><td>$42,000</td><td>$30,240</td><td>$11,760</td><td>$45,000</td><td>3 Jun</td><td>31 Dec</td><td>9 Sep</td><td>ken@hooli.com</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;div class="uimi-table-wrap uimi-table-wrap--freeze-col"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+
+          <div class="uimi-col-12">
+            <p class="uimi-label">Freeze header and columns</p>
+            <article class="uimi-card">
+              <div class="uimi-table-wrap uimi-table-wrap--freeze-head uimi-table-wrap--freeze-col uimi-table-wrap--freeze-end">
+                <table class="uimi-table">
+                  <thead>
+                    <tr>
+                      <th>Account</th>
+                      <th>Team</th>
+                      <th>Owner</th>
+                      <th>Region</th>
+                      <th>Stage</th>
+                      <th>Priority</th>
+                      <th>Budget</th>
+                      <th>Spent</th>
+                      <th>Remaining</th>
+                      <th>Forecast</th>
+                      <th>Start</th>
+                      <th>Due</th>
+                      <th>Updated</th>
+                      <th>Contact</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Northwind ERP</td><td>8</td><td>Maya Chen</td><td>North</td><td>Build</td><td>High</td><td>$14,000</td><td>$8,400</td><td>$5,600</td><td>$15,200</td><td>1 Aug</td><td>30 Sep</td><td>16 Sep</td><td>maya@northwind.io</td><td><span class="uimi-badge uimi-badge--info">Active</span></td></tr>
+                    <tr><td>Contoso migration</td><td>5</td><td>Luis Ortega</td><td>West</td><td>Plan</td><td>Med</td><td>$3,000</td><td>$300</td><td>$2,700</td><td>$3,400</td><td>12 Aug</td><td>15 Oct</td><td>14 Sep</td><td>luis@contoso.com</td><td><span class="uimi-badge uimi-badge--warn">In review</span></td></tr>
+                    <tr><td>Acme finance close</td><td>12</td><td>Priya Shah</td><td>East</td><td>Close</td><td>High</td><td>$20,500</td><td>$20,500</td><td>$0</td><td>$20,500</td><td>1 Jul</td><td>12 Sep</td><td>12 Sep</td><td>priya@acme.co</td><td><span class="uimi-badge uimi-badge--ok">Approved</span></td></tr>
+                    <tr><td>Globex audit pack</td><td>3</td><td>Jonah Hale</td><td>South</td><td>Review</td><td>Low</td><td>$8,400</td><td>$2,100</td><td>$6,300</td><td>$8,900</td><td>20 Aug</td><td>1 Nov</td><td>11 Sep</td><td>jonah@globex.com</td><td><span class="uimi-badge uimi-badge--neutral">Draft</span></td></tr>
+                    <tr><td>Initech onboarding</td><td>6</td><td>Asha Patel</td><td>North</td><td>Build</td><td>Med</td><td>$9,200</td><td>$3,680</td><td>$5,520</td><td>$9,800</td><td>5 Aug</td><td>20 Oct</td><td>10 Sep</td><td>asha@initech.com</td><td><span class="uimi-badge uimi-badge--info">Active</span></td></tr>
+                    <tr><td>Hooli platform</td><td>15</td><td>Ken Miles</td><td>West</td><td>Scale</td><td>High</td><td>$42,000</td><td>$30,240</td><td>$11,760</td><td>$45,000</td><td>3 Jun</td><td>31 Dec</td><td>9 Sep</td><td>ken@hooli.com</td><td><span class="uimi-badge uimi-badge--info">Active</span></td></tr>
+                    <tr><td>Pied Piper sync</td><td>4</td><td>Rina Cho</td><td>East</td><td>Plan</td><td>Med</td><td>$6,100</td><td>$1,098</td><td>$5,002</td><td>$6,500</td><td>18 Aug</td><td>22 Oct</td><td>8 Sep</td><td>rina@piedpiper.com</td><td><span class="uimi-badge uimi-badge--warn">In review</span></td></tr>
+                    <tr><td>Soylent ledger</td><td>7</td><td>Omar Diallo</td><td>South</td><td>Build</td><td>High</td><td>$11,800</td><td>$6,490</td><td>$5,310</td><td>$12,400</td><td>9 Jul</td><td>28 Sep</td><td>7 Sep</td><td>omar@soylent.com</td><td><span class="uimi-badge uimi-badge--info">Active</span></td></tr>
+                    <tr><td>Stark inventory</td><td>9</td><td>Elena Voss</td><td>North</td><td>Close</td><td>Low</td><td>$27,400</td><td>$24,112</td><td>$3,288</td><td>$27,400</td><td>2 May</td><td>6 Sep</td><td>6 Sep</td><td>elena@stark.tech</td><td><span class="uimi-badge uimi-badge--ok">Approved</span></td></tr>
+                    <tr><td>Wayne security</td><td>11</td><td>Theo Marsh</td><td>West</td><td>Review</td><td>Med</td><td>$19,600</td><td>$6,468</td><td>$13,132</td><td>$21,000</td><td>14 Jul</td><td>15 Nov</td><td>5 Sep</td><td>theo@wayne.co</td><td><span class="uimi-badge uimi-badge--neutral">Draft</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;div class="uimi-table-wrap uimi-table-wrap--freeze-head uimi-table-wrap--freeze-col uimi-table-wrap--freeze-end"&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="notifications" hidden>
+        <aside class="uimi-note" aria-label="Notifications">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Notifications</span></div>
+          <p>The bell in the top bar opens a panel. These alerts sit in the page.</p>
+        </aside>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-8">
+            <div style="display:grid;gap:10px">
+              <div class="uimi-alert">A new invoice is waiting for finance review.</div>
+              <div class="uimi-alert uimi-alert--ok">Invoice #2400 was approved.</div>
+              <div class="uimi-alert uimi-alert--warn">The Contoso migration is still at 10%.</div>
+              <div class="uimi-alert uimi-alert--danger">Payment method could not be verified.</div>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-4">
+            <h3>Activity</h3>
+            <p class="uimi-muted"><span class="uimi-delta uimi-delta--up">+8</span> updates this week</p>
+            <div class="uimi-timeline" style="margin-top:16px">
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-success)"></span>
+                <div>
+                  <strong>Invoice #2400 approved</strong>
+                  <div class="uimi-muted">22 Dec, 19:20</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot"></span>
+                <div>
+                  <strong>New order #1832412</strong>
+                  <div class="uimi-muted">21 Dec, 23:21</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-info)"></span>
+                <div>
+                  <strong>April infrastructure payment</strong>
+                  <div class="uimi-muted">21 Dec, 21:28</div>
+                </div>
+              </div>
+              <div class="uimi-cluster" style="align-items:flex-start">
+                <span class="uimi-dot" style="background:var(--uimi-warning)"></span>
+                <div>
+                  <strong>Payment method updated</strong>
+                  <div class="uimi-muted">20 Dec, 15:52</div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="badges" hidden>
+        <aside class="uimi-note" aria-label="Badges">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Badges</span></div>
+          <p>Small status labels. They sit on cards, tables, and tabs. They are not buttons.</p>
+        </aside>
+        <section class="uimi-card">
+          <p class="uimi-label">Tones</p>
+          <div class="uimi-cluster" style="margin:8px 0 16px">
+            <span class="uimi-badge uimi-badge--info">Active</span>
+            <span class="uimi-badge uimi-badge--ok">Approved</span>
+            <span class="uimi-badge uimi-badge--warn">In review</span>
+            <span class="uimi-badge uimi-badge--neutral">Draft</span>
+          </div>
+          <div class="uimi-table-wrap">
+            <table class="uimi-table">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Northwind ERP</td>
+                  <td><span class="uimi-badge uimi-badge--info">Active</span></td>
+                </tr>
+                <tr>
+                  <td>Invoice #2400</td>
+                  <td><span class="uimi-badge uimi-badge--ok">Approved</span></td>
+                </tr>
+                <tr>
+                  <td>Invoice #2401</td>
+                  <td><span class="uimi-badge uimi-badge--warn">In review</span></td>
+                </tr>
+                <tr>
+                  <td>Invoice #2402</td>
+                  <td><span class="uimi-badge uimi-badge--neutral">Draft</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="charts" hidden>
+        <aside class="uimi-note" aria-label="Charts">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Charts</span></div>
+          <p>Bar, stacked, line, area, or donut. Multi-series charts pull the full theme chart palette.</p>
+        </aside>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-7">
+            <h3>Bar</h3>
+            <p class="uimi-muted">Quarterly values</p>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="bar" data-uimi-chart-color="primary" data-uimi-chart-values="42,58,36,72,54,88,64,76,48,91,70,62" data-uimi-chart-labels="Q1,Q2,Q3,Q4"></div>
+          </article>
+          <article class="uimi-card uimi-col-5">
+            <h3>Mix</h3>
+            <p class="uimi-muted">Share of delivery work this quarter</p>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="donut" data-uimi-chart-color="primary" data-uimi-chart-values="14,12,11,10,10,9,9,8,8,9" data-uimi-chart-labels="Core,API,Web,Mobile,Data,Ops,Support,Sales,Legal,Other"></div>
+          </article>
+          <article class="uimi-card uimi-col-12">
+            <h3>Stacked</h3>
+            <p class="uimi-muted">Revenue by workstream</p>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="stacked" data-uimi-chart-color="primary" data-uimi-chart-values="18,14,10,8,6,22,16,12,9,7,20,18,11,10,8,26,20,14,12,9" data-uimi-chart-labels="Q1,Q2,Q3,Q4" data-uimi-chart-series="Platform,Onboarding,Compliance,Support,Ops"></div>
+            <div class="uimi-snippet">
+              <pre class="uimi-code"><code>&lt;div class="uimi-chart" data-uimi-chart data-uimi-chart-type="stacked" data-uimi-chart-values="18,14,10,8,6,22,16,12,9,7,20,18,11,10,8,26,20,14,12,9" data-uimi-chart-labels="Q1,Q2,Q3,Q4" data-uimi-chart-series="Platform,Onboarding,Compliance,Support,Ops"&gt;&lt;/div&gt;</code></pre>
+              <button class="uimi-btn uimi-btn--ghost uimi-btn--sm" type="button" data-uimi-copy>Copy</button>
+            </div>
+          </article>
+          <article class="uimi-card uimi-col-7">
+            <h3>Trend</h3>
+            <p class="uimi-muted">Weekly completions</p>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="line" data-uimi-chart-color="primary" data-uimi-chart-values="28,34,31,48,44,62,58,71,66,80,74,88" data-uimi-chart-labels="Q1,Q2,Q3,Q4"></div>
+          </article>
+          <article class="uimi-card uimi-col-5">
+            <h3>Volume</h3>
+            <p class="uimi-muted">Invoices posted</p>
+            <div class="uimi-chart" data-uimi-chart data-uimi-chart-type="area" data-uimi-chart-color="primary" data-uimi-chart-values="18,24,22,36,40,38,52,48,61,58,70,76" data-uimi-chart-labels="Q1,Q2,Q3,Q4"></div>
+          </article>
+          <article class="uimi-card uimi-col-12">
+            <h3>Progress</h3>
+            <p class="uimi-muted">Workstreams this quarter</p>
+            <div style="display:grid;gap:16px;margin-top:16px">
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Platform migration</span><strong>80%</strong></div>
+                <div class="uimi-progress uimi-progress--navy"><span style="width:80%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Client onboarding</span><strong>64%</strong></div>
+                <div class="uimi-progress"><span style="width:64%"></span></div>
+              </div>
+              <div>
+                <div class="uimi-cluster" style="justify-content:space-between"><span>Compliance review</span><strong>92%</strong></div>
+                <div class="uimi-progress uimi-progress--green"><span style="width:92%"></span></div>
+              </div>
+            </div>
+          </article>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="forms" hidden>
+        <aside class="uimi-note" aria-label="Forms">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Forms</span></div>
+          <p>One sample of each control. Labels name the type. Dropdowns, dates, and fields stay in this catalog.</p>
+        </aside>
+        <section class="uimi-card">
+          <div class="uimi-grid">
+            <label class="uimi-field uimi-col-6">
+              <span class="uimi-label">Text field</span>
+              <input class="uimi-input" type="text" value="Sample value" />
+            </label>
+            <label class="uimi-field uimi-col-6">
+              <span class="uimi-label">Disabled</span>
+              <input class="uimi-input" type="text" value="Read only" disabled />
+            </label>
+            <label class="uimi-field uimi-col-6">
+              <span class="uimi-label">Error</span>
+              <input class="uimi-input uimi-input--error" type="text" value="INV" />
+              <span class="uimi-field-msg uimi-field-msg--error">This field needs a valid value.</span>
+            </label>
+            <label class="uimi-field uimi-col-6">
+              <span class="uimi-label">Dropdown</span>
+              <select class="uimi-select" aria-label="Dropdown">
+                <option>Option 1</option>
+                <option selected>Option 2</option>
+                <option>Option 3</option>
+              </select>
+            </label>
+            <label class="uimi-field uimi-col-6">
+              <span class="uimi-label">Date</span>
+              <div class="uimi-datepicker" data-uimi-datepicker>
+                <input class="uimi-input" type="text" readonly value="16 Sep 2026" aria-haspopup="dialog" aria-label="Date" />
+                <button class="uimi-datepicker__btn" type="button" aria-label="Open calendar">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                </button>
+                <div class="uimi-calendar" hidden role="dialog" aria-label="Date"></div>
+              </div>
+            </label>
+            <div class="uimi-field uimi-col-12">
+              <span class="uimi-label">Day, month, year</span>
+              <div class="uimi-dateparts" data-uimi-dateparts data-value="16 Sep 2026">
+                <select class="uimi-select" data-part="day" aria-label="Day"></select>
+                <select class="uimi-select" data-part="month" aria-label="Month"></select>
+                <select class="uimi-select" data-part="year" aria-label="Year"></select>
+              </div>
+            </div>
+            <label class="uimi-field uimi-col-12">
+              <span class="uimi-label">Textarea</span>
+              <textarea class="uimi-textarea" placeholder="Longer text"></textarea>
+            </label>
+            <div class="uimi-field uimi-col-6">
+              <span class="uimi-label">Calendar</span>
+              <div class="uimi-calendar uimi-calendar--inline" data-uimi-calendar></div>
+            </div>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="tabs" hidden>
+        <aside class="uimi-note" aria-label="Tabs">
+          <div class="uimi-note__bar" aria-hidden="true"><i></i><i></i><i></i><span>Tabs</span></div>
+          <p>Line tabs. The selected page is marked with a bar under the label.</p>
+        </aside>
+        <section class="uimi-card">
+          <div class="uimi-tabset" data-uimi-tabs>
+            <div class="uimi-tabs" role="tablist" aria-label="Account pages">
+              <button class="uimi-tab" type="button" data-tab="overview" aria-selected="true">Overview</button>
+              <button class="uimi-tab" type="button" data-tab="invoices" aria-selected="false">Invoices</button>
+              <button class="uimi-tab" type="button" data-tab="team" aria-selected="false">Team</button>
+            </div>
+            <div class="uimi-tab-panel" role="tabpanel" data-uimi-panel="overview">
+              <p class="uimi-muted" style="margin:0 0 16px">Northwind ERP is on the Business plan. Three invoices are waiting on finance.</p>
+              <div class="uimi-cluster">
+                <span class="uimi-badge uimi-badge--info">Business</span>
+                <span class="uimi-badge uimi-badge--warn">3 open invoices</span>
+                <span class="uimi-badge uimi-badge--ok">8 seats</span>
+              </div>
+              <div class="uimi-grid" style="margin-top:16px">
+                <article class="uimi-card uimi-col-4" style="padding:11px">
+                  <div class="uimi-muted">Spend this quarter</div>
+                  <strong style="font-size:22px">$14,000</strong>
+                </article>
+                <article class="uimi-card uimi-col-4" style="padding:11px">
+                  <div class="uimi-muted">Completion</div>
+                  <strong style="font-size:22px">60%</strong>
+                </article>
+                <article class="uimi-card uimi-col-4" style="padding:11px">
+                  <div class="uimi-muted">Owner</div>
+                  <strong style="font-size:22px">A. Rahman</strong>
+                </article>
+              </div>
+            </div>
+            <div class="uimi-tab-panel" role="tabpanel" data-uimi-panel="invoices" hidden>
+              <div class="uimi-table-wrap">
+                <table class="uimi-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice</th>
+                      <th>Due</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>#2400</td>
+                      <td>22 Dec</td>
+                      <td>$4,200</td>
+                      <td><span class="uimi-badge uimi-badge--ok">Approved</span></td>
+                    </tr>
+                    <tr>
+                      <td>#2401</td>
+                      <td>28 Dec</td>
+                      <td>$1,850</td>
+                      <td><span class="uimi-badge uimi-badge--warn">In review</span></td>
+                    </tr>
+                    <tr>
+                      <td>#2402</td>
+                      <td>4 Jan</td>
+                      <td>$3,100</td>
+                      <td><span class="uimi-badge uimi-badge--neutral">Draft</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="uimi-tab-panel" role="tabpanel" data-uimi-panel="team" hidden>
+              <div style="display:grid;gap:12px">
+                <div class="uimi-cluster" style="justify-content:space-between">
+                  <span class="uimi-who"><span class="uimi-avatar">AR</span> Amina Rahman</span>
+                  <span class="uimi-badge uimi-badge--info">Owner</span>
+                </div>
+                <div class="uimi-cluster" style="justify-content:space-between">
+                  <span class="uimi-who"><span class="uimi-avatar">NW</span> Noah Walsh</span>
+                  <span class="uimi-badge uimi-badge--neutral">Finance</span>
+                </div>
+                <div class="uimi-cluster" style="justify-content:space-between">
+                  <span class="uimi-who"><span class="uimi-avatar">CT</span> Clara Thorne</span>
+                  <span class="uimi-badge uimi-badge--neutral">Delivery</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        </section>
+
+        <section class="uimi-page" data-uimi-page="settings" hidden>
+        <section class="uimi-grid">
+          <article class="uimi-card uimi-col-12">
+            <p class="uimi-kicker" style="color:var(--uimi-primary)">Fonts</p>
+            <h2 class="uimi-display" style="font-size:22px;color:var(--uimi-ink)">Typefaces</h2>
+            <p class="uimi-muted">Inter and Cooper Hewitt (OFL) for UI and headings. Body stays thin; headings use semibold weights.</p>
+            <div class="uimi-font-choices" role="listbox" aria-label="Typeface">
+              <button class="uimi-font-choice" type="button" role="option" data-uimi-font-choice="inter" aria-selected="true" aria-pressed="true">
+                <strong>Inter</strong>
+                <span>Good afternoon, Amina — $53,000</span>
+              </button>
+              <button class="uimi-font-choice" type="button" role="option" data-uimi-font-choice="cooper-hewitt" aria-selected="false" aria-pressed="false">
+                <strong>Cooper Hewitt</strong>
+                <span>Good afternoon, Amina — $53,000</span>
+              </button>
+            </div>
+          </article>
+        </section>
+        </section>
+
+      </main>
+    </div>
+    <button class="uimi-copy-fab" type="button" data-uimi-copy-page hidden aria-label="Copy layout">
+      <svg class="uimi-copy-fab__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+      <svg class="uimi-copy-fab__done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12.5 9.5 17 19 7"/></svg>
+    </button>
+    <script src="uimi.js?v=ready2"></script>
+  </body>
+</html>
