@@ -7,27 +7,45 @@
     midnight: { font: "inter", display: "inter" },
     apricot: { font: "inter", display: "inter" },
     pastel: { font: "inter", display: "inter" },
+    "lavender-mist": { font: "inter", display: "inter" },
   };
   const palettes = Object.keys(themes);
+  if (localStorage.getItem("uimi-theme-set") !== "lavender-mist") {
+    localStorage.setItem("uimi-palette", "lavender-mist");
+    localStorage.setItem("uimi-theme-set", "lavender-mist");
+  }
   const savedPalette = localStorage.getItem("uimi-palette");
-  const initialPalette = palettes.includes(savedPalette) ? savedPalette : "apricot";
+  const initialPalette = palettes.includes(savedPalette) ? savedPalette : "lavender-mist";
 
   const applyPalette = (id) => {
-    const next = palettes.includes(id) ? id : "apricot";
+    const next = palettes.includes(id) ? id : "lavender-mist";
+    const prev =
+      root.getAttribute("data-uimi-palette") || localStorage.getItem("uimi-palette") || "";
+    const changed = Boolean(prev) && prev !== next;
     root.setAttribute("data-uimi-palette", next);
     localStorage.setItem("uimi-palette", next);
     document.querySelectorAll("[data-uimi-palette-select]").forEach((select) => {
       select.value = next;
     });
+    // Only wipe paint/move when the user switches themes — not on every page load.
+    // Glass mode is independent of palette (like iPhone LG on/off) — keep map, sync backdrop.
+    if (!changed) return;
     localStorage.removeItem("uimi-paint-map");
+    localStorage.removeItem("uimi-move-map");
     if (typeof window.__UIMI_CLEAR_PAINT__ === "function") {
       window.__UIMI_CLEAR_PAINT__();
     } else {
-      document.getElementById("uimi-paint-sheet") && (document.getElementById("uimi-paint-sheet").textContent = "");
+      const paintSheetEl = document.getElementById("uimi-paint-sheet");
+      if (paintSheetEl) paintSheetEl.textContent = "";
     }
+    const moveSheetEl = document.getElementById("uimi-move-sheet");
+    if (moveSheetEl) moveSheetEl.textContent = "";
+    if (typeof window.__UIMI_CLEAR_MOVE__ === "function") window.__UIMI_CLEAR_MOVE__();
+    if (typeof window.__UIMI_SYNC_GLASS_BG__ === "function") window.__UIMI_SYNC_GLASS_BG__();
+    if (typeof window.__UIMI_SYNC_GLASS_INK__ === "function") window.__UIMI_SYNC_GLASS_INK__();
   };
 
-  const fontIds = ["inter", "cooper-hewitt"];
+  const fontIds = ["inter", "cooper-hewitt", "poppins"];
   const savedFont = localStorage.getItem("uimi-font");
   const savedDisplay = localStorage.getItem("uimi-font-display");
   const initialFont = fontIds.includes(savedFont) ? savedFont : "inter";
@@ -158,19 +176,31 @@
   };
   writeSession(readSession(), localStorage.getItem(sessionKey) === "in");
 
-  const pages = ["login-1", "login-2", "dashboard-1", "dashboard-2", "dashboard-3", "buttons-1", "buttons-2", "buttons-3", "cards", "tables", "notifications", "badges", "charts", "forms", "tabs", "settings"];
+  const pages = ["login-1", "login-2", "dashboard-1", "dashboard-2", "dashboard-3", "buttons", "cards", "tables", "notifications", "badges", "charts", "forms", "tabs", "settings"];
   const loginPages = ["login-1", "login-2"];
   const workspacePages = pages.filter((id) => !loginPages.includes(id));
-  const pageAliases = { login: "login-1", signin: "login-1", auth: "login-1", dashboard: "dashboard-1", accounts: "tables", kit: "settings", use: "dashboard-1", usage: "dashboard-1", top: "dashboard-1", buttons: "buttons-1" };
+  const pageAliases = {
+    login: "login-1",
+    signin: "login-1",
+    auth: "login-1",
+    dashboard: "dashboard-1",
+    accounts: "tables",
+    kit: "settings",
+    use: "dashboard-1",
+    usage: "dashboard-1",
+    top: "dashboard-1",
+    buttons: "buttons",
+    "buttons-1": "buttons",
+    "buttons-2": "buttons",
+    "buttons-3": "buttons",
+  };
   const pageLabels = {
     "login-1": "Login 1",
     "login-2": "Login 2",
     "dashboard-1": "Dashboard 1",
     "dashboard-2": "Dashboard 2",
     "dashboard-3": "Dashboard 3",
-    "buttons-1": "Button 1",
-    "buttons-2": "Button 2",
-    "buttons-3": "Button 3",
+    buttons: "Buttons",
     cards: "Cards",
     tables: "Tables",
     notifications: "Notifications",
@@ -180,24 +210,6 @@
     tabs: "Tabs",
     settings: "Settings",
   };
-  const pageGroups = {
-    "login-1": "Login",
-    "login-2": "Login",
-    "dashboard-1": "Dashboard",
-    "dashboard-2": "Dashboard",
-    "dashboard-3": "Dashboard",
-    "buttons-1": "Components",
-    "buttons-2": "Components",
-    "buttons-3": "Components",
-    cards: "Components",
-    tables: "Components",
-    notifications: "Components",
-    badges: "Components",
-    charts: "Components",
-    forms: "Components",
-    tabs: "Components",
-  };
-
   const pageFromHash = () => {
     const signedIn = readSession();
     const raw = (location.hash || (signedIn ? "#dashboard-1" : "#login-1")).replace("#", "");
@@ -223,15 +235,6 @@
     });
     document.querySelectorAll(".uimi-nav a[href^='#']").forEach((link) => {
       link.classList.toggle("is-active", link.getAttribute("href") === `#${next}`);
-    });
-    document.querySelectorAll("[data-uimi-crumb]").forEach((crumb) => {
-      crumb.textContent = pageLabels[next];
-    });
-    document.querySelectorAll("[data-uimi-crumb-group]").forEach((group) => {
-      group.hidden = !pageGroups[next];
-    });
-    document.querySelectorAll("[data-uimi-crumb-parent]").forEach((parent) => {
-      parent.textContent = pageGroups[next] || "";
     });
     document.querySelectorAll(".uimi-nav-group").forEach((group) => {
       if (group.querySelector("a.is-active")) group.open = true;
@@ -274,34 +277,34 @@
   window.addEventListener("hashchange", syncPage);
   syncPage();
 
+  const demoEmail = "m.islam@uimi.com";
+  const demoPassword = "uimi";
+
   document.querySelectorAll("[data-uimi-login]").forEach((loginForm) => {
     const loginMsg = loginForm.querySelector("[data-uimi-login-msg]");
-  const setLoginMsg = (text, ok = false) => {
-    if (!loginMsg) return;
-    loginMsg.hidden = !text;
-    loginMsg.textContent = text || "";
-    loginMsg.classList.toggle("is-ok", Boolean(ok));
-  };
+    const emailInput = loginForm.querySelector('input[name="email"]');
+    const passwordInput = loginForm.querySelector('input[name="password"]');
+    const fillDemoCreds = () => {
+      if (emailInput) emailInput.value = demoEmail;
+      if (passwordInput) passwordInput.value = demoPassword;
+    };
+    fillDemoCreds();
+    const setLoginMsg = (text, ok = false) => {
+      if (!loginMsg) return;
+      loginMsg.hidden = !text;
+      loginMsg.textContent = text || "";
+      loginMsg.classList.toggle("is-ok", Boolean(ok));
+    };
     loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const data = new FormData(loginForm);
-    const email = String(data.get("email") || "").trim();
-    const password = String(data.get("password") || "");
-    const remember = data.get("remember") === "on";
-      if (email.toLowerCase() !== "m.islam@uimi.com") {
-        setLoginMsg("Use m.islam@uimi.com for the demo.");
-      return;
-    }
-    if (password.toLowerCase() !== "uimi") {
-      setLoginMsg("Password is incorrect. Use uimi for the demo.");
-      return;
-    }
-    setLoginMsg("");
-    writeSession(true, remember);
+      event.preventDefault();
+      const data = new FormData(loginForm);
+      const remember = data.get("remember") === "on";
+      setLoginMsg("");
+      writeSession(true, remember);
       location.hash = "dashboard-1";
-  });
+    });
     loginForm.querySelector("[data-uimi-forgot]")?.addEventListener("click", () => {
-    setLoginMsg("Ask your admin to reset it. Demo password is uimi.", true);
+      setLoginMsg("Ask your admin to reset it.", true);
     });
   });
   document.querySelectorAll("[data-uimi-sign-out]").forEach((button) => {
@@ -341,7 +344,7 @@
     if (event.key === "Escape") closeNotify();
   });
 
-  const chartTypes = ["bar", "line", "area", "donut", "stacked"];
+  const chartTypes = ["bar", "hbar", "grouped", "line", "area", "spark", "donut", "pie", "gauge", "stacked"];
   const chartColors = ["primary", "navy", "success", "warn", "info", "ink"];
   let chartSeq = 0;
 
@@ -361,8 +364,10 @@
 
   const parseChartLabels = (el, count) => parseChartNames(el.dataset.uimiChartLabels, count);
 
+  /* Theme series 1–10; mono charts use --uimi-chart-fill (accent / data-uimi-chart-color). */
   const chartSeries = (index) =>
-    `var(--uimi-chart-${(index % 10) + 1}, var(--uimi-chart-fill, var(--uimi-primary)))`;
+    `var(--uimi-chart-${(index % 10) + 1}, var(--uimi-chart-fill, var(--uimi-chart-accent, var(--uimi-primary))))`;
+  const chartAccent = () => `var(--uimi-chart-fill, var(--uimi-chart-accent, var(--uimi-primary)))`;
   const chartFill = (index) => chartSeries(index);
   const chartBarFill = (index) => chartSeries(index);
 
@@ -396,6 +401,61 @@
     return `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${large} 1 ${x2} ${y2} Z`;
   };
 
+  const arcPath = (cx, cy, radius, start, end) => {
+    const [x1, y1] = polar(cx, cy, radius, start);
+    const [x2, y2] = polar(cx, cy, radius, end);
+    const large = end - start > 180 ? 1 : 0;
+    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${radius} ${radius} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  };
+
+  const chartColumns = (el, values) => {
+    const namedSeries = (el.dataset.uimiChartSeries || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const namedLabels = (el.dataset.uimiChartLabels || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    let seriesCount = namedSeries.length;
+    if (!seriesCount && namedLabels.length && values.length % namedLabels.length === 0) {
+      seriesCount = values.length / namedLabels.length;
+    }
+    if (!seriesCount) seriesCount = Math.min(3, values.length);
+    const columns = [];
+    for (let i = 0; i + seriesCount <= values.length; i += seriesCount) {
+      columns.push(values.slice(i, i + seriesCount));
+    }
+    if (!columns.length) return null;
+    return {
+      columns,
+      seriesCount,
+      labels: Array.from({ length: columns.length }, (_, index) => namedLabels[index] || `Q${index + 1}`),
+      series: parseChartNames(el.dataset.uimiChartSeries, seriesCount),
+    };
+  };
+
+  const renderPieLike = (el, values, { hole = false, label = "Pie chart" } = {}) => {
+    const slices = groupChartValues(values, Math.min(10, values.length));
+    const total = slices.reduce((sum, value) => sum + value, 0) || 1;
+    const labels = parseChartLabels(el, slices.length);
+    let angle = 0;
+    const paths = slices
+      .map((value, index) => {
+        const sweep = (value / total) * 360;
+        const start = angle;
+        const end = angle + Math.max(sweep, 0.01);
+        angle = end;
+        return `<path class="uimi-chart-mark" d="${pieSlice(50, 50, 42, start, end)}" fill="${chartFill(index)}"></path>`;
+      })
+      .join("");
+    const legend = slices
+      .map((value, index) => `<li><i style="background:${chartFill(index)}"></i>${labels[index]} · ${Math.round((value / total) * 100)}%</li>`)
+      .join("");
+    const holeMark = hole ? `<circle class="uimi-chart-hole" cx="50" cy="50" r="24"></circle>` : "";
+    el.innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="${label}">${paths}${holeMark}</svg><ul class="uimi-chart-legend">${legend}</ul>`;
+  };
+
   const renderChart = (el) => {
     const type = chartTypes.includes(el.dataset.uimiChartType) ? el.dataset.uimiChartType : "bar";
     const color = chartColors.includes(el.dataset.uimiChartColor) ? el.dataset.uimiChartColor : "primary";
@@ -412,67 +472,90 @@
     const max = Math.max(...values, 1);
 
     if (type === "donut") {
-      const slices = groupChartValues(values, Math.min(10, values.length));
-      const total = slices.reduce((sum, value) => sum + value, 0) || 1;
-      const labels = parseChartLabels(el, slices.length);
-      let angle = 0;
-      const paths = slices
-        .map((value, index) => {
-          const sweep = (value / total) * 360;
-          const start = angle;
-          const end = angle + Math.max(sweep, 0.01);
-          angle = end;
-          return `<path d="${pieSlice(50, 50, 42, start, end)}" fill="${chartFill(index)}"></path>`;
-        })
-        .join("");
-      const legend = slices
-        .map((value, index) => `<li><i style="background:${chartFill(index)}"></i>${labels[index]} · ${Math.round((value / total) * 100)}%</li>`)
-        .join("");
-      el.innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="Donut chart">${paths}<circle class="uimi-chart-hole" cx="50" cy="50" r="24"></circle></svg><ul class="uimi-chart-legend">${legend}</ul>`;
+      renderPieLike(el, values, { hole: true, label: "Donut chart" });
       return;
     }
 
-    if (type === "stacked") {
-      const namedSeries = (el.dataset.uimiChartSeries || "")
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-      const namedLabels = (el.dataset.uimiChartLabels || "")
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-      let seriesCount = namedSeries.length;
-      if (!seriesCount && namedLabels.length && values.length % namedLabels.length === 0) {
-        seriesCount = values.length / namedLabels.length;
-      }
-      if (!seriesCount) seriesCount = Math.min(3, values.length);
-      const columns = [];
-      for (let i = 0; i + seriesCount <= values.length; i += seriesCount) {
-        columns.push(values.slice(i, i + seriesCount));
-      }
-      if (!columns.length) {
+    if (type === "pie") {
+      renderPieLike(el, values, { hole: false, label: "Pie chart" });
+      return;
+    }
+
+    if (type === "hbar") {
+      const labels = parseChartLabels(el, values.length);
+      const rows = values
+        .map((value, index) => {
+          const pct = Math.max((value / max) * 100, 1.5);
+          return `<li><span class="uimi-chart-hbar__label">${labels[index]}</span><span class="uimi-chart-hbar__track"><i style="width:${pct.toFixed(1)}%;background:${chartBarFill(index)}"></i></span><span class="uimi-chart-hbar__value">${value}</span></li>`;
+        })
+        .join("");
+      el.innerHTML = `<ul class="uimi-chart-hbar" role="img" aria-label="Horizontal bar chart">${rows}</ul>`;
+      return;
+    }
+
+    if (type === "gauge") {
+      const value = values[0];
+      const ceiling = values[1] > 0 ? values[1] : 100;
+      const pct = Math.max(0, Math.min(100, (value / ceiling) * 100));
+      const sweep = (pct / 100) * 270;
+      const start = 225;
+      const end = start + sweep;
+      const track = arcPath(50, 54, 34, 225, 495);
+      const valueArc = pct > 0 ? arcPath(50, 54, 34, start, end) : "";
+      const label = (el.dataset.uimiChartLabels || "").split(",")[0]?.trim() || "Score";
+      el.innerHTML = `<div class="uimi-chart-gauge"><svg viewBox="0 0 100 100" role="img" aria-label="Gauge chart"><path class="uimi-chart-gauge__track" d="${track}" fill="none" stroke-width="10" stroke-linecap="round"></path>${valueArc ? `<path class="uimi-chart-gauge__value" d="${valueArc}" fill="none" stroke="${chartAccent()}" stroke-width="10" stroke-linecap="round"></path>` : ""}</svg><div class="uimi-chart-gauge__readout"><strong>${Math.round(pct)}%</strong><span>${label}</span></div></div>`;
+      return;
+    }
+
+    if (type === "stacked" || type === "grouped") {
+      const packed = chartColumns(el, values);
+      if (!packed) {
         el.innerHTML = "";
         return;
       }
-      const labels = Array.from({ length: columns.length }, (_, index) => namedLabels[index] || `Q${index + 1}`);
-      const series = parseChartNames(el.dataset.uimiChartSeries, seriesCount);
-      const stackMax = Math.max(...columns.map((col) => col.reduce((sum, value) => sum + value, 0)), 1);
+      const { columns, seriesCount, labels, series } = packed;
       const plotH = height - pad * 2;
       const plotW = width - pad * 2;
       const gap = 2.4;
-      const barW = (plotW - gap * (columns.length - 1)) / columns.length;
+      const groupW = (plotW - gap * (columns.length - 1)) / columns.length;
       const grid = chartGrid(width, height, pad);
+      const legend = series.map((name, index) => `<li><i style="background:${chartFill(index)}"></i>${name}</li>`).join("");
+      const axis = labels.map((label) => `<span>${label}</span>`).join("");
+      el.style.setProperty("--uimi-chart-cols", String(columns.length));
+
+      if (type === "grouped") {
+        const innerGap = 1.2;
+        const barW = (groupW - innerGap * (seriesCount - 1)) / seriesCount;
+        const groupMax = Math.max(...columns.flat(), 1);
+        const bars = columns
+          .map((col, colIndex) => {
+            const groupX = pad + colIndex * (groupW + gap);
+            return col
+              .map((value, seriesIndex) => {
+                const barH = Math.max((value / groupMax) * plotH, 1.5);
+                const x = groupX + seriesIndex * (barW + innerGap);
+                const y = height - pad - barH;
+                return `<rect class="uimi-chart-mark" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.6" fill="${chartFill(seriesIndex)}"></rect>`;
+              })
+              .join("");
+          })
+          .join("");
+        el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Grouped bar chart">${grid}${bars}</svg><div class="uimi-chart-axis">${axis}</div><ul class="uimi-chart-legend">${legend}</ul>`;
+        return;
+      }
+
+      const stackMax = Math.max(...columns.map((col) => col.reduce((sum, value) => sum + value, 0)), 1);
       const uid = `uimi-stack-${++chartSeq}`;
       const clips = [];
       const bars = columns
         .map((col, colIndex) => {
-          const x = pad + colIndex * (barW + gap);
+          const x = pad + colIndex * (groupW + gap);
           const total = col.reduce((sum, value) => sum + value, 0);
           const barH = Math.max((total / stackMax) * plotH, 1.5);
           const yTop = height - pad - barH;
           const clipId = `${uid}-${colIndex}`;
           clips.push(
-            `<clipPath id="${clipId}"><rect x="${x.toFixed(1)}" y="${yTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.6"/></clipPath>`
+            `<clipPath id="${clipId}"><rect x="${x.toFixed(1)}" y="${yTop.toFixed(1)}" width="${groupW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.6"/></clipPath>`
           );
           let y = height - pad;
           const rects = col
@@ -480,15 +563,12 @@
               const h = (value / stackMax) * plotH;
               if (h <= 0) return "";
               y -= h;
-              return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" fill="${chartFill(seriesIndex)}"></rect>`;
+              return `<rect class="uimi-chart-mark" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${groupW.toFixed(1)}" height="${h.toFixed(1)}" fill="${chartFill(seriesIndex)}"></rect>`;
             })
             .join("");
           return `<g clip-path="url(#${clipId})">${rects}</g>`;
         })
         .join("");
-      const axis = labels.map((label) => `<span>${label}</span>`).join("");
-      const legend = series.map((name, index) => `<li><i style="background:${chartFill(index)}"></i>${name}</li>`).join("");
-      el.style.setProperty("--uimi-chart-cols", String(columns.length));
       el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Stacked bar chart"><defs>${clips.join("")}</defs>${grid}${bars}</svg><div class="uimi-chart-axis">${axis}</div><ul class="uimi-chart-legend">${legend}</ul>`;
       return;
     }
@@ -503,11 +583,17 @@
     const pts = points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
     const grid = chartGrid(width, height, pad);
 
-    if (type === "line") {
-      const dots = points
-        .map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="currentColor"></circle>`)
-        .join("");
-      el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Line chart">${grid}<polyline fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="${pts}"></polyline>${dots}</svg>`;
+    if (type === "line" || type === "spark") {
+      const stroke = type === "spark" ? "2" : "2.4";
+      const accent = chartAccent();
+      const dots =
+        type === "line"
+          ? points
+              .map(([x, y]) => `<circle class="uimi-chart-mark" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="${accent}"></circle>`)
+              .join("")
+          : "";
+      const gridMark = type === "line" ? grid : "";
+      el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${type === "spark" ? "Sparkline" : "Line chart"}">${gridMark}<polyline class="uimi-chart-stroke" fill="none" stroke="${accent}" stroke-width="${stroke}" stroke-linejoin="round" stroke-linecap="round" points="${pts}"></polyline>${dots}</svg>`;
       return;
     }
 
@@ -515,7 +601,8 @@
       const first = points[0];
       const last = points[points.length - 1];
       const area = `M ${first[0].toFixed(1)} ${height - pad} L ${pts} L ${last[0].toFixed(1)} ${height - pad} Z`;
-      el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Area chart">${grid}<path d="${area}" fill="currentColor" opacity="0.18"></path><polyline fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="${pts}"></polyline></svg>`;
+      const accent = chartAccent();
+      el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Area chart">${grid}<path class="uimi-chart-area" d="${area}" fill="${accent}" opacity="0.18"></path><polyline class="uimi-chart-stroke" fill="none" stroke="${accent}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" points="${pts}"></polyline></svg>`;
       return;
     }
 
@@ -526,7 +613,7 @@
         const barH = Math.max((value / max) * plotH, 1.5);
         const x = pad + index * (barW + gap);
         const y = height - pad - barH;
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.6" fill="${chartBarFill(index)}"></rect>`;
+        return `<rect class="uimi-chart-mark" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="1.6" fill="${chartBarFill(index)}"></rect>`;
       })
       .join("");
     el.innerHTML = `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Bar chart">${grid}${bars}</svg>`;
@@ -562,10 +649,11 @@
 
     const setupAttrs = () => {
       const shell = root.getAttribute("data-uimi-shell") || "sidebar";
-      const palette = root.getAttribute("data-uimi-palette") || "apricot";
+      const palette = root.getAttribute("data-uimi-palette") || "lavender-mist";
       const font = root.getAttribute("data-uimi-font") || "inter";
       const display = root.getAttribute("data-uimi-display") || font;
-      return `data-uimi-shell="${shell}" data-uimi-palette="${palette}" data-uimi-font="${font}" data-uimi-display="${display}"`;
+      const glass = root.getAttribute("data-uimi-glass") === "on" ? "on" : "off";
+      return `data-uimi-shell="${shell}" data-uimi-palette="${palette}" data-uimi-font="${font}" data-uimi-display="${display}" data-uimi-glass="${glass}"`;
     };
 
     const currentPageMarkup = () => {
@@ -575,7 +663,15 @@
       const clone = source.cloneNode(true);
       clone.removeAttribute("hidden");
       clone.removeAttribute("data-uimi-page");
-      clone.querySelectorAll("[data-uimi-copy-page], .uimi-snippet, .uimi-note").forEach((el) => el.remove());
+      clone
+        .querySelectorAll(
+          '[data-uimi-kit="authoring"], [data-uimi-kit="catalog"], [data-uimi-copy-page], .uimi-studio, .uimi-paint-pop, .uimi-glass-gear, .uimi-glass-modal, .uimi-copy-fab, .uimi-snippet, .uimi-note, .uimi-kit-mark'
+        )
+        .forEach((el) => el.remove());
+      clone.querySelectorAll(".uimi-mark").forEach((el) => {
+        el.classList.remove("uimi-kit-mark");
+        el.replaceChildren();
+      });
       clone.querySelectorAll("[data-uimi-login-msg]").forEach((el) => el.remove());
       clone.querySelectorAll("[data-uimi-chart]").forEach((el) => el.replaceChildren());
       clone.querySelectorAll("input:not([type='checkbox'])").forEach((el) => el.removeAttribute("value"));
@@ -609,9 +705,9 @@
     };
 
     const pageButton = () => {
-      const page = document.querySelector(".uimi-page:not([hidden])")?.getAttribute("data-uimi-page");
-      const shape = page === "buttons-2" ? " uimi-btn--square" : page === "buttons-3" ? " uimi-btn--pill" : "";
-      return `<button class="uimi-btn uimi-btn--primary${shape}">Save changes</button>`;
+      const picked = document.querySelector('[data-uimi-page^="buttons"]:not([hidden]) .uimi-cluster .uimi-btn.is-picked');
+      if (picked) return sampleMarkup(picked);
+      return `<button class="uimi-btn uimi-btn--primary">Save</button>`;
     };
 
     const sampleMarkup = (btn) => {
@@ -643,8 +739,29 @@
       return wrapSetup(pageButton());
     };
 
+    const BTN_SIZE_CLASSES = ["uimi-btn--lg", "uimi-btn--md", "uimi-btn--sm"];
+    const applyCardPreviewSize = (card, sizeClass) => {
+      if (!card) return;
+      card.querySelectorAll(".uimi-cluster .uimi-btn").forEach((el) => {
+        if (el.closest(".uimi-snippet")) return;
+        if (el.closest("[data-uimi-btn-sizes]")) return;
+        BTN_SIZE_CLASSES.forEach((name) => el.classList.remove(name));
+        if (sizeClass) el.classList.add(sizeClass);
+      });
+      card.querySelectorAll("[data-uimi-btn-sizes] .uimi-btn").forEach((el) => {
+        const match = sizeClass && el.classList.contains(sizeClass);
+        el.classList.toggle("is-size-active", Boolean(match));
+        el.setAttribute("aria-pressed", match ? "true" : "false");
+      });
+    };
+
     document.querySelectorAll('[data-uimi-page^="buttons"] .uimi-cluster .uimi-btn').forEach((btn) => {
       btn.addEventListener("click", () => {
+        const sizes = btn.closest("[data-uimi-btn-sizes]");
+        if (sizes) {
+          const sizeClass = BTN_SIZE_CLASSES.find((name) => btn.classList.contains(name)) || null;
+          applyCardPreviewSize(btn.closest(".uimi-card"), sizeClass);
+        }
         pickButton(btn);
         copyText(setupSnippet()).catch(() => {});
       });
@@ -671,362 +788,145 @@
       });
     });
 
+    // Grouped by similar hue; shades ordered dark → light
     const PAINT_COLORS = {
-      floral_white: {
-        DEFAULT: "#f7f4ea",
-        100: "#463b1a",
-        200: "#8b7735",
-        300: "#c2ab5e",
-        400: "#dccfa3",
-        500: "#f7f4ea",
-        600: "#f8f6ed",
-        700: "#faf8f2",
-        800: "#fcfaf6",
-        900: "#fdfdfb",
+      Cream: {
+        Wheat: "#e6d5b8",
+        Sand: "#fcf1d0",
+        Ivory: "#fcf2e5",
+        Shell: "#fff8f0",
+        Soft: "#f9f7f7",
+        Snow: "#ffffff",
       },
-      lavender: {
-        DEFAULT: "#ded9e2",
-        100: "#2d2732",
-        200: "#5a4d64",
-        300: "#877595",
-        400: "#b2a7bc",
-        500: "#ded9e2",
-        600: "#e5e1e8",
-        700: "#ebe9ee",
-        800: "#f2f0f3",
-        900: "#f8f8f9",
+      Clay: {
+        Ink: "#2c1810",
+        Cocoa: "#4b2e2b",
+        Char: "#524646",
+        Walnut: "#8c5a3c",
+        Tan: "#c08552",
+        Stone: "#a8a492",
+        Ash: "#c9c2b2",
       },
-      periwinkle: {
-        DEFAULT: "#c0b9dd",
-        100: "#201b37",
-        200: "#40356e",
-        300: "#6150a5",
-        400: "#9083c3",
-        500: "#c0b9dd",
-        600: "#cec8e4",
-        700: "#dad6eb",
-        800: "#e6e3f2",
-        900: "#f3f1f8",
+      Amber: {
+        Bronze: "#c9922a",
+        Gold: "#f9b637",
+        Butter: "#fcbf49",
+        Honey: "#ffdd9c",
+        Cream: "#ffebb8",
+        Pale: "#fff6d9",
       },
-      wisteria_blue: {
-        DEFAULT: "#80a1d4",
-        100: "#111f33",
-        200: "#233e66",
-        300: "#345c99",
-        400: "#4f7dc3",
-        500: "#80a1d4",
-        600: "#9bb5dd",
-        700: "#b4c8e5",
-        800: "#cddaee",
-        900: "#e6edf6",
+      Flame: {
+        Fire: "#e73f1e",
+        Terra: "#ec5b38",
+        Flame: "#fb6c00",
+        Orange: "#f77f00",
+        Peach: "#ff9f5a",
+        Apricot: "#ffc08a",
       },
-      pearl_aqua: {
-        DEFAULT: "#75c9c8",
-        100: "#122e2d",
-        200: "#235b5a",
-        300: "#358987",
-        400: "#47b6b4",
-        500: "#75c9c8",
-        600: "#8fd4d2",
-        700: "#abdede",
-        800: "#c7e9e9",
-        900: "#e3f4f4",
+      Rose: {
+        Plum: "#601d49",
+        Wine: "#8b1e3d",
+        Crimson: "#d62828",
+        Berry: "#bd5579",
+        Blush: "#ea9d9d",
+        Mist: "#f5d0d0",
       },
-      gray: {
-        50: "#f9fafb",
-        100: "#f3f4f6",
-        200: "#e5e7eb",
-        300: "#d1d5db",
-        400: "#9ca3af",
-        500: "#6b7280",
-        600: "#4b5563",
-        700: "#374151",
-        800: "#1f2937",
-        900: "#111827",
-        950: "#030712",
+      Iris: {
+        Violet: "#4a4de0",
+        Indigo: "#6367ff",
+        Periwinkle: "#8494ff",
+        Lilac: "#c9beff",
+        Bloom: "#ffdbfd",
+        Haze: "#ebe4ff",
       },
-      slate: {
-        50: "#f8fafc",
-        100: "#f1f5f9",
-        200: "#e2e8f0",
-        300: "#cbd5e1",
-        400: "#94a3b8",
-        500: "#64748b",
-        600: "#475569",
-        700: "#334155",
-        800: "#1e293b",
-        900: "#0f172a",
+      Paper: {
+        Marine: "#003049",
+        Night: "#112d4e",
+        Ocean: "#1a5276",
+        Steel: "#3f72af",
+        Sky: "#7ba3d4",
+        Fog: "#dbe2ef",
+        Cloud: "#eef2f7",
       },
-      zinc: {
-        50: "#fafafa",
-        100: "#f4f4f5",
-        200: "#e4e4e7",
-        300: "#d4d4d8",
-        400: "#a1a1aa",
-        500: "#71717a",
-        600: "#52525b",
-        700: "#3f3f46",
-        800: "#27272a",
-        900: "#18181b",
+      Abyss: {
+        Void: "#010736",
+        Deep: "#0d1c42",
+        Cove: "#22396f",
+        Mid: "#2f4a8a",
+        Soft: "#4a6aad",
       },
-      stone: {
-        50: "#fafaf9",
-        100: "#f5f5f4",
-        200: "#e7e5e4",
-        300: "#d6d3d1",
-        400: "#a8a29e",
-        500: "#78716c",
-        600: "#57534e",
-        700: "#44403c",
-        800: "#292524",
-        900: "#1c1917",
-      },
-      red: {
-        50: "#fef2f2",
-        100: "#fee2e2",
-        200: "#fecaca",
-        300: "#fca5a5",
-        400: "#f87171",
-        500: "#ef4444",
-        600: "#dc2626",
-        700: "#b91c1c",
-        800: "#991b1b",
-        900: "#7f1d1d",
-      },
-      orange: {
-        50: "#fff7ed",
-        100: "#ffedd5",
-        200: "#fed7aa",
-        300: "#fdba74",
-        400: "#fb923c",
-        500: "#f97316",
-        600: "#ea580c",
-        700: "#c2410c",
-        800: "#9a3412",
-        900: "#7c2d12",
-      },
-      amber: {
-        50: "#fffbeb",
-        100: "#fef3c7",
-        200: "#fde68a",
-        300: "#fcd34d",
-        400: "#fbbf24",
-        500: "#f59e0b",
-        600: "#d97706",
-        700: "#b45309",
-        800: "#92400e",
-        900: "#78350f",
-      },
-      yellow: {
-        50: "#fefce8",
-        100: "#fef9c3",
-        200: "#fef08a",
-        300: "#fde047",
-        400: "#facc15",
-        500: "#eab308",
-        600: "#ca8a04",
-        700: "#a16207",
-        800: "#854d0e",
-        900: "#713f12",
-      },
-      lime: {
-        50: "#f7fee7",
-        100: "#ecfccb",
-        200: "#d9f99d",
-        300: "#bef264",
-        400: "#a3e635",
-        500: "#84cc16",
-        600: "#65a30d",
-        700: "#4d7c0f",
-        800: "#3f6212",
-        900: "#365314",
-      },
-      green: {
-        50: "#f0fdf4",
-        100: "#dcfce7",
-        200: "#bbf7d0",
-        300: "#86efac",
-        400: "#4ade80",
-        500: "#22c55e",
-        600: "#16a34a",
-        700: "#15803d",
-        800: "#166534",
-        900: "#14532d",
-      },
-      emerald: {
-        50: "#ecfdf5",
-        100: "#d1fae5",
-        200: "#a7f3d0",
-        300: "#6ee7b7",
-        400: "#34d399",
-        500: "#10b981",
-        600: "#059669",
-        700: "#047857",
-        800: "#065f46",
-        900: "#064e3b",
-      },
-      teal: {
-        50: "#f0fdfa",
-        100: "#ccfbf1",
-        200: "#99f6e4",
-        300: "#5eead4",
-        400: "#2dd4bf",
-        500: "#14b8a6",
-        600: "#0d9488",
-        700: "#0f766e",
-        800: "#115e59",
-        900: "#134e4a",
-      },
-      cyan: {
-        50: "#ecfeff",
-        100: "#cffafe",
-        200: "#a5f3fc",
-        300: "#67e8f9",
-        400: "#22d3ee",
-        500: "#06b6d4",
-        600: "#0891b2",
-        700: "#0e7490",
-        800: "#155e75",
-        900: "#164e63",
-      },
-      sky: {
-        50: "#f0f9ff",
-        100: "#e0f2fe",
-        200: "#bae6fd",
-        300: "#7dd3fc",
-        400: "#38bdf8",
-        500: "#0ea5e9",
-        600: "#0284c7",
-        700: "#0369a1",
-        800: "#075985",
-        900: "#0c4a6e",
-      },
-      blue: {
-        50: "#eff6ff",
-        100: "#dbeafe",
-        200: "#bfdbfe",
-        300: "#93c5fd",
-        400: "#60a5fa",
-        500: "#3b82f6",
-        600: "#2563eb",
-        700: "#1d4ed8",
-        800: "#1e40af",
-        900: "#1e3a8a",
-      },
-      indigo: {
-        50: "#eef2ff",
-        100: "#e0e7ff",
-        200: "#c7d2fe",
-        300: "#a5b4fc",
-        400: "#818cf8",
-        500: "#6366f1",
-        600: "#4f46e5",
-        700: "#4338ca",
-        800: "#3730a3",
-        900: "#312e81",
-      },
-      violet: {
-        50: "#f5f3ff",
-        100: "#ede9fe",
-        200: "#ddd6fe",
-        300: "#c4b5fd",
-        400: "#a78bfa",
-        500: "#8b5cf6",
-        600: "#7c3aed",
-        700: "#6d28d9",
-        800: "#5b21b6",
-        900: "#4c1d95",
-      },
-      purple: {
-        50: "#faf5ff",
-        100: "#f3e8ff",
-        200: "#e9d5ff",
-        300: "#d8b4fe",
-        400: "#c084fc",
-        500: "#a855f7",
-        600: "#9333ea",
-        700: "#7e22ce",
-        800: "#6b21a8",
-        900: "#581c87",
-      },
-      fuchsia: {
-        50: "#fdf4ff",
-        100: "#fae8ff",
-        200: "#f5d0fe",
-        300: "#f0abfc",
-        400: "#e879f9",
-        500: "#d946ef",
-        600: "#c026d3",
-        700: "#a21caf",
-        800: "#86198f",
-        900: "#701a75",
-      },
-      pink: {
-        50: "#fdf2f8",
-        100: "#fce7f3",
-        200: "#fbcfe8",
-        300: "#f9a8d4",
-        400: "#f472b6",
-        500: "#ec4899",
-        600: "#db2777",
-        700: "#be185d",
-        800: "#9d174d",
-        900: "#831843",
-      },
-      rose: {
-        50: "#fff1f2",
-        100: "#ffe4e6",
-        200: "#fecdd3",
-        300: "#fda4af",
-        400: "#fb7185",
-        500: "#f43f5e",
-        600: "#e11d48",
-        700: "#be123c",
-        800: "#9f1239",
-        900: "#881337",
-      },
-      black_white: {
-        white: "#ffffff",
-        snow: "#fafafa",
-        mist: "#f5f5f5",
-        silver: "#c0c0c0",
-        ash: "#808080",
-        charcoal: "#36454f",
-        ink: "#0a0a0a",
-        black: "#000000",
-        transparent: "transparent",
+      Mint: {
+        Sea: "#3d9ca3",
+        Teal: "#71c9ce",
+        Aqua: "#a6e3e9",
+        Frost: "#cbf1f5",
+        Ice: "#e3fdfd",
+        Foam: "#f0fffe",
       },
     };
 
     const PAINT_PROPS = [
       { id: "background", label: "fill" },
+      { id: "color", label: "text" },
       { id: "border-color", label: "border" },
     ];
     const PAINT_KEY = "uimi-paint-map";
+    const SWATCH_KEY = "uimi-paint-swatches";
     const paintSheet = document.createElement("style");
     paintSheet.id = "uimi-paint-sheet";
     document.head.appendChild(paintSheet);
 
     const clonePaintMap = (map) => JSON.parse(JSON.stringify(map || {}));
 
-    const stripFontColors = (map) => {
-      const next = {};
-      Object.entries(map || {}).forEach(([id, styles]) => {
-        const cleaned = { ...(styles || {}) };
-        delete cleaned.color;
-        if (Object.keys(cleaned).length) next[id] = cleaned;
-      });
-      return next;
+    const normalizeSwatchHex = (value) => {
+      if (!value) return null;
+      const raw = String(typeof value === "string" ? value : value.hex || "")
+        .trim()
+        .toLowerCase();
+      if (/^#[0-9a-f]{6}$/.test(raw)) return raw;
+      if (/^#[0-9a-f]{3}$/.test(raw)) {
+        return `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`;
+      }
+      return null;
     };
 
     const loadPaintMap = () => {
       try {
-        return stripFontColors(JSON.parse(localStorage.getItem(PAINT_KEY) || "{}") || {});
+        return JSON.parse(localStorage.getItem(PAINT_KEY) || "{}") || {};
       } catch {
         return {};
       }
     };
 
+    const loadCustomSwatches = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem(SWATCH_KEY) || "[]");
+        if (!Array.isArray(raw)) return [];
+        const seen = new Set();
+        const list = [];
+        raw.forEach((item) => {
+          const hex = normalizeSwatchHex(item);
+          if (!hex || seen.has(hex)) return;
+          seen.add(hex);
+          list.push(hex);
+        });
+        return list;
+      } catch {
+        return [];
+      }
+    };
+
+    const saveCustomSwatches = (list) => {
+      try {
+        const clean = (list || []).map(normalizeSwatchHex).filter(Boolean);
+        localStorage.setItem(SWATCH_KEY, JSON.stringify(clean));
+        return clean;
+      } catch {
+        return list || [];
+      }
+    };
+
+    let customSwatches = loadCustomSwatches();
     let paintSaved = clonePaintMap(loadPaintMap());
     let paintMap = clonePaintMap(paintSaved);
     let paintHistory = [];
@@ -1039,9 +939,12 @@
       paintSheet.textContent = "";
       refreshPaintUi();
     };
+    window.__UIMI_SWATCHES__ = () => customSwatches.slice();
     let paintTarget = null;
     let paintProp = "background";
     let paintDrag = null;
+    let paintSampleProp = null;
+    let paintClipboard = null;
 
     // Drop any previously saved font colors
     localStorage.setItem(PAINT_KEY, JSON.stringify(paintSaved));
@@ -1075,6 +978,13 @@
           decls.push(`border-color:${value} !important`);
           decls.push("border-style:solid !important");
           decls.push("border-width:1px !important");
+        } else if (prop === "background") {
+          decls.push(`background-color:${value} !important`);
+          decls.push("background-image:none !important");
+          decls.push(`background:${value} !important`);
+        } else if (prop === "color") {
+          decls.push(`color:${value} !important`);
+          decls.push(`-webkit-text-fill-color:${value} !important`);
         } else {
           decls.push(`${prop}:${value} !important`);
         }
@@ -1097,7 +1007,7 @@
     };
 
     const persistPaint = () => {
-      paintSaved = stripFontColors(clonePaintMap(paintMap));
+      paintSaved = clonePaintMap(paintMap);
       paintMap = clonePaintMap(paintSaved);
       localStorage.setItem(PAINT_KEY, JSON.stringify(paintSaved));
       paintHistory = [];
@@ -1129,8 +1039,6 @@
       [".uimi-topbar", "shell-topbar"],
       [".uimi-main", "shell-main"],
       [".uimi-body", "shell-body"],
-      [".uimi-crumbs", "shell-crumbs"],
-      [".uimi-help", "shell-help"],
 
       ['[data-uimi-page="login-1"] .uimi-auth--split', "login1-shell"],
       ['[data-uimi-page="login-1"] .uimi-auth-brand', "login1-brand"],
@@ -1156,19 +1064,21 @@
       ['[data-uimi-page="login-2"] .uimi-auth-card .uimi-link', "login2-card-link"],
       ['[data-uimi-page="login-2"] .uimi-mark', "login2-mark"],
 
+      ['[data-uimi-page="dashboard-1"]', "dash1-page"],
       ['[data-uimi-page="dashboard-1"] .uimi-banner', "dash1-banner"],
       ['[data-uimi-page="dashboard-1"] .uimi-card', "dash1-card"],
       ['[data-uimi-page="dashboard-1"] .uimi-btn', "dash1-btn"],
       ['[data-uimi-page="dashboard-1"] .uimi-stat', "dash1-stat"],
+      ['[data-uimi-page="dashboard-2"]', "dash2-page"],
       ['[data-uimi-page="dashboard-2"] .uimi-page-head', "dash2-head"],
       ['[data-uimi-page="dashboard-2"] .uimi-card', "dash2-card"],
       ['[data-uimi-page="dashboard-2"] .uimi-btn', "dash2-btn"],
+      ['[data-uimi-page="dashboard-3"]', "dash3-page"],
       ['[data-uimi-page="dashboard-3"] .uimi-page-head', "dash3-head"],
       ['[data-uimi-page="dashboard-3"] .uimi-card', "dash3-card"],
       ['[data-uimi-page="dashboard-3"] .uimi-btn', "dash3-btn"],
 
       ['[data-uimi-page^="buttons"] .uimi-card', "buttons-card"],
-      ['[data-uimi-page^="buttons"] .uimi-note', "buttons-note"],
       ['[data-uimi-page^="buttons"] .uimi-btn--primary', "buttons-primary"],
       ['[data-uimi-page^="buttons"] .uimi-btn--ghost', "buttons-ghost"],
       ['[data-uimi-page="cards"] .uimi-card', "cards-card"],
@@ -1206,17 +1116,19 @@
       "login2-card-btn": "login1-card-btn",
       "login2-card-link": "login1-card-link",
       "login2-mark": "login1-mark",
+      "dash1-page": "login1-shell",
       "dash1-banner": "login1-brand",
       "dash1-card": "login1-card",
       "dash1-btn": "login1-card-btn",
+      "dash2-page": "login1-card",
       "dash2-head": "login1-card",
       "dash2-card": "login1-card",
       "dash2-btn": "login1-card-btn",
+      "dash3-page": "login1-brand",
       "dash3-head": "login1-card",
       "dash3-card": "login1-card",
       "dash3-btn": "login1-card-btn",
       "buttons-card": "login1-card",
-      "buttons-note": "login1-brand",
       "buttons-primary": "login1-card-btn",
       "cards-card": "login1-card",
       "cards-note": "login1-brand",
@@ -1317,11 +1229,26 @@
       if (source["login1-brand"]) next["shell-navbar"] = { ...source["login1-brand"] };
       if (source["login1-card"]) next["shell-topbar"] = { ...source["login1-card"] };
       if (source["login1-shell"] && source["login1-card"]) {
-        next["shell-main"] = {
-          background: mixHex(source["login1-shell"].background || source["login1-card"].background, source["login1-card"].background || "#ffffff", 0.55),
-        };
+        const mainBg = mixHex(
+          source["login1-shell"].background || source["login1-card"].background,
+          source["login1-card"].background || "#ffffff",
+          0.55
+        );
+        next["shell-main"] = { background: mainBg };
+        // Each dashboard keeps its own page fill (lock seeds them; paint can diverge)
+        if (!next["dash1-page"]?.background) next["dash1-page"] = { background: mainBg };
+        if (!next["dash2-page"]?.background) {
+          next["dash2-page"] = {
+            background: mixHex(mainBg, source["login1-card"].background || "#ffffff", 0.35),
+          };
+        }
+        if (!next["dash3-page"]?.background) {
+          next["dash3-page"] = {
+            background: mixHex(mainBg, source["login1-brand"]?.background || mainBg, 0.25),
+          };
+        }
       }
-      paintMap = stripFontColors(next);
+      paintMap = next;
       renderPaintSheet();
       window.__UIMI_PAINT_LOCK__ = {
         from: "login-1",
@@ -1358,12 +1285,33 @@
     const popover = document.createElement("div");
     popover.className = "uimi-paint-pop";
     popover.hidden = true;
+    popover.setAttribute("data-uimi-kit", "authoring");
     popover.innerHTML = `
       <div class="uimi-paint-pop__head" data-uimi-paint-drag>
         <span class="uimi-paint-pop__grip" aria-hidden="true"></span>
         <strong data-uimi-paint-target-label>Element</strong>
         <button type="button" class="uimi-paint-pop__close" data-uimi-paint-close aria-label="Close">×</button>
         </div>
+      <div class="uimi-paint-pop__wheels">
+        <label class="uimi-paint-pop__wheel">
+          <span>Background</span>
+          <span class="uimi-paint-pop__wheel-row">
+            <input type="color" data-uimi-paint-wheel="background" value="#ffffff" />
+            <button type="button" class="uimi-paint-pop__dropper" data-uimi-paint-dropper="background" title="Sample background from another element" aria-label="Sample background from another element" aria-pressed="false">↘</button>
+          </span>
+        </label>
+        <label class="uimi-paint-pop__wheel">
+          <span>Foreground</span>
+          <span class="uimi-paint-pop__wheel-row">
+            <input type="color" data-uimi-paint-wheel="color" value="#000000" />
+            <button type="button" class="uimi-paint-pop__dropper" data-uimi-paint-dropper="color" title="Sample text color from another element" aria-label="Sample text color from another element" aria-pressed="false">↘</button>
+          </span>
+        </label>
+      </div>
+      <div class="uimi-paint-pop__clip" hidden>
+        <code class="uimi-paint-pop__clip-hex" data-uimi-paint-clip-hex title="Click to apply · double-click to add swatch"></code>
+        <button type="button" class="uimi-paint-pop__clip-add" data-uimi-paint-swatch-add title="Add to swatches" aria-label="Add to swatches">＋</button>
+      </div>
       <div class="uimi-paint-pop__props" role="tablist">
         ${PAINT_PROPS.map(
           (prop) =>
@@ -1378,41 +1326,145 @@
     document.body.appendChild(popover);
 
     const swatchRoot = popover.querySelector("[data-uimi-paint-swatches]");
-    Object.entries(PAINT_COLORS).forEach(([family, shades]) => {
-      const row = document.createElement("div");
-      row.className = "uimi-paint-pop__family";
-      row.innerHTML = `<span class="uimi-paint-pop__family-name">${family.replace(/_/g, " ")}</span>`;
-      const chips = document.createElement("div");
-      chips.className = "uimi-paint-pop__chips";
-      Object.entries(shades).forEach(([step, hex]) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "uimi-paint-pop__chip";
-        if (hex === "transparent") {
-          btn.classList.add("is-transparent");
-        } else {
-          btn.style.background = hex;
-        }
-        btn.title = `${family} ${step} ${hex}`;
-        btn.setAttribute("aria-label", `${family} ${step} ${hex}`);
-        btn.dataset.hex = hex;
-        chips.appendChild(btn);
+
+    const makeSwatchChip = (name, hex) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "uimi-paint-pop__chip";
+      const swatch = document.createElement("span");
+      swatch.className = "uimi-paint-pop__chip-swatch";
+      if (hex === "transparent") {
+        swatch.classList.add("is-transparent");
+      } else {
+        swatch.style.setProperty("background-color", hex, "important");
+      }
+      const label = document.createElement("span");
+      label.className = "uimi-paint-pop__chip-name";
+      label.textContent = name;
+      btn.appendChild(swatch);
+      btn.appendChild(label);
+      btn.title = `${name} ${hex}`;
+      btn.setAttribute("aria-label", `${name} ${hex}`);
+      btn.dataset.hex = hex;
+      btn.dataset.name = name;
+      return btn;
+    };
+
+    const renderPaintSwatches = () => {
+      swatchRoot.innerHTML = "";
+      const families = {};
+      if (customSwatches.length) {
+        families.Saved = {};
+        customSwatches.forEach((hex) => {
+          families.Saved[hex.slice(1).toUpperCase()] = hex;
+        });
+      }
+      Object.assign(families, PAINT_COLORS);
+      Object.entries(families).forEach(([family, shades]) => {
+        const row = document.createElement("div");
+        row.className = "uimi-paint-pop__family";
+        row.innerHTML = `<span class="uimi-paint-pop__family-name">${family}</span>`;
+        const chips = document.createElement("div");
+        chips.className = "uimi-paint-pop__chips";
+        Object.entries(shades).forEach(([name, hex]) => {
+          chips.appendChild(makeSwatchChip(name, hex));
+        });
+        row.appendChild(chips);
+        swatchRoot.appendChild(row);
       });
-      row.appendChild(chips);
-      swatchRoot.appendChild(row);
-    });
+    };
+
+    const currentPaintHex = () => {
+      if (paintClipboard) return toWheelHex(paintClipboard, null);
+      const wheel = popover.querySelector(`[data-uimi-paint-wheel="${paintProp === "color" ? "color" : "background"}"]`);
+      if (wheel?.value) return toWheelHex(wheel.value, null);
+      if (!paintTarget) return null;
+      const id = paintTarget.dataset.uimiPaint;
+      const saved = paintMap[id]?.[paintProp];
+      return toWheelHex(saved, null);
+    };
+
+    let syncPaintChipsRef = () => {};
+
+    const addClipboardToSwatch = () => {
+      const hex = normalizeSwatchHex(currentPaintHex());
+      if (!hex) return false;
+      if (customSwatches.includes(hex)) {
+        syncClipAddButton();
+        return false;
+      }
+      customSwatches = saveCustomSwatches([hex, ...customSwatches]);
+      paintClipboard = hex;
+      const row = popover.querySelector(".uimi-paint-pop__clip");
+      const hexLabel = popover.querySelector("[data-uimi-paint-clip-hex]");
+      if (row) row.hidden = false;
+      if (hexLabel) {
+        hexLabel.textContent = hex;
+        hexLabel.dataset.hex = hex;
+      }
+      copyText(hex).catch(() => {});
+      renderPaintSwatches();
+      syncPaintChipsRef();
+      syncClipAddButton();
+      swatchRoot.querySelector(".uimi-paint-pop__family")?.scrollIntoView({ block: "nearest" });
+      return true;
+    };
+
+    const syncClipAddButton = () => {
+      const addBtn = popover.querySelector("[data-uimi-paint-swatch-add]");
+      if (!addBtn) return;
+      const hex = currentPaintHex();
+      const alreadySaved = Boolean(hex && customSwatches.includes(hex));
+      addBtn.disabled = !hex || alreadySaved;
+      addBtn.title = !hex
+        ? "Pick or sample a color first"
+        : alreadySaved
+          ? "Already in Saved"
+          : `Add ${hex} to swatches`;
+    };
 
     const clearPaintPreview = () => {
       previewSheet.textContent = "";
     };
 
-    const showPaintPreview = (hex) => {
+    const showPaintPreview = (hex, prop = paintProp) => {
       if (!paintTarget || !hex) {
         clearPaintPreview();
         return;
       }
       const id = ensurePaintId(paintTarget);
-      previewSheet.textContent = `[data-uimi-paint="${id}"]{${paintDeclsFor({ [paintProp]: hex })}}`;
+      const styles = { ...(paintMap[id] || {}), [prop]: hex };
+      previewSheet.textContent = `[data-uimi-paint="${id}"]{${paintDeclsFor(styles)}}`;
+    };
+
+    let paintLiveStarted = false;
+
+    const livePaintValue = (prop, hex) => {
+      if (!paintTarget || !hex || !prop) return;
+      const id = ensurePaintId(paintTarget);
+      if (!paintLiveStarted) {
+        pushPaintHistory();
+        paintLiveStarted = true;
+      }
+      paintMap[id] = { ...(paintMap[id] || {}), [prop]: hex };
+      clearPaintPreview();
+      renderPaintSheet();
+      const wheelHex = /^#[0-9a-f]{6}$/i.test(hex) ? hex.toLowerCase() : null;
+      if (wheelHex) {
+        if (prop === "border-color" || prop === "background" || prop === "color") {
+          popover.querySelectorAll("[data-uimi-paint-wheel]").forEach((wheel) => {
+            wheel.value = wheelHex;
+          });
+        }
+      }
+      popover.querySelectorAll(".uimi-paint-pop__chip").forEach((chip) => {
+        chip.setAttribute("aria-pressed", String(prop === paintProp && chip.dataset.hex === hex));
+      });
+      setPaintClipboard(hex);
+    };
+
+    const endLivePaint = () => {
+      paintLiveStarted = false;
     };
 
     const placePaintPop = (preferredX, preferredY, { flip = false } = {}) => {
@@ -1430,6 +1482,31 @@
       popover.style.top = `${Math.round(y)}px`;
     };
 
+    const toWheelHex = (value, fallback = "#ffffff") => {
+      if (!value || value === "transparent") return fallback;
+      const raw = String(value).trim().toLowerCase();
+      if (/^#[0-9a-f]{6}$/i.test(raw)) return raw;
+      if (/^#[0-9a-f]{3}$/i.test(raw)) {
+        const rgb = hexToRgb(raw);
+        return rgb ? rgbToHex(rgb) : fallback;
+      }
+      // rgb(255, 0, 0) / rgba(255, 0, 0, 1) / rgb(255 0 0 / 1)
+      const match = raw.match(
+        /rgba?\(\s*([\d.]+)\s*[,/\s]\s*([\d.]+)\s*[,/\s]\s*([\d.]+)/i
+      );
+      if (match) {
+        return rgbToHex({
+          r: Number(match[1]),
+          g: Number(match[2]),
+          b: Number(match[3]),
+        });
+      }
+      return fallback;
+    };
+
+    customSwatches = loadCustomSwatches();
+    renderPaintSwatches();
+
     const syncPaintChips = () => {
       if (!paintTarget) return;
       const id = paintTarget.dataset.uimiPaint;
@@ -1437,10 +1514,90 @@
       popover.querySelectorAll(".uimi-paint-pop__chip").forEach((chip) => {
         chip.setAttribute("aria-pressed", String(chip.dataset.hex === current));
       });
+      syncPaintWheels();
+    };
+    syncPaintChipsRef = syncPaintChips;
+
+    const syncPaintWheels = () => {
+      if (!paintTarget) return;
+      const id = paintTarget.dataset.uimiPaint;
+      const styles = paintMap[id] || {};
+      const computed = window.getComputedStyle(paintTarget);
+      const bgWheel = popover.querySelector('[data-uimi-paint-wheel="background"]');
+      const fgWheel = popover.querySelector('[data-uimi-paint-wheel="color"]');
+      let active;
+      if (paintProp === "color") {
+        active = toWheelHex(styles.color || computed.color, "#000000");
+      } else if (paintProp === "border-color") {
+        active = toWheelHex(styles["border-color"] || computed.borderColor, "#000000");
+      } else {
+        active = toWheelHex(styles.background || computed.backgroundColor, "#ffffff");
+      }
+      if (bgWheel) bgWheel.value = active;
+      if (fgWheel) fgWheel.value = active;
+      if (active) setPaintClipboard(active);
+      else syncClipAddButton();
+    };
+
+    const setSampleMode = (prop) => {
+      paintSampleProp = prop || null;
+      root.setAttribute("data-uimi-paint-sample", paintSampleProp || "");
+      popover.querySelectorAll("[data-uimi-paint-dropper]").forEach((btn) => {
+        const on = btn.dataset.uimiPaintDropper === paintSampleProp;
+        btn.setAttribute("aria-pressed", String(on));
+      });
+    };
+
+    const clearSampleMode = () => setSampleMode(null);
+
+    const sampleColorFromElement = (el, prop) => {
+      if (!el) return null;
+      const computed = window.getComputedStyle(el);
+      if (prop === "color") return toWheelHex(computed.color, "#000000");
+      let node = el;
+      for (let i = 0; i < 8 && node; i += 1) {
+        const bg = window.getComputedStyle(node).backgroundColor;
+        if (bg && bg !== "transparent" && !/^rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/i.test(bg)) {
+          return toWheelHex(bg, "#ffffff");
+        }
+        node = node.parentElement;
+      }
+      return toWheelHex(computed.backgroundColor, "#ffffff");
+    };
+
+    const setPaintClipboard = (hex) => {
+      const normalized = toWheelHex(hex, null);
+      paintClipboard = normalized || null;
+      const row = popover.querySelector(".uimi-paint-pop__clip");
+      const hexLabel = popover.querySelector("[data-uimi-paint-clip-hex]");
+      if (!row || !hexLabel) return;
+      if (!paintClipboard) {
+        row.hidden = true;
+        hexLabel.textContent = "";
+        syncClipAddButton();
+        return;
+      }
+      row.hidden = false;
+      hexLabel.textContent = paintClipboard;
+      hexLabel.dataset.hex = paintClipboard;
+      copyText(paintClipboard).catch(() => {});
+      syncClipAddButton();
+    };
+
+    const applyPaintValue = (prop, hex) => {
+      if (!paintTarget || !hex) return;
+      const id = ensurePaintId(paintTarget);
+      pushPaintHistory();
+      paintMap[id] = { ...(paintMap[id] || {}), [prop]: hex };
+      clearPaintPreview();
+      renderPaintSheet();
+      syncPaintChips();
     };
 
     const closePaintPop = () => {
       clearPaintPreview();
+      endLivePaint();
+      clearSampleMode();
       popover.hidden = true;
       paintTarget = null;
       paintDrag = null;
@@ -1459,6 +1616,12 @@
     };
 
     const setPaintMode = (on) => {
+      if (on && typeof window.__UIMI_SET_MOVE_MODE__ === "function") {
+        window.__UIMI_SET_MOVE_MODE__(false);
+      }
+      if (on && typeof window.__UIMI_HIDE_GLASS_UI__ === "function") {
+        window.__UIMI_HIDE_GLASS_UI__();
+      }
       if (!on && paintIsDirty()) {
         revertPaint();
         if (typeof clearPaintPreview === "function") clearPaintPreview();
@@ -1537,6 +1700,59 @@
       });
     });
 
+    popover.querySelectorAll("[data-uimi-paint-wheel]").forEach((input) => {
+      input.addEventListener("pointerdown", () => {
+        paintLiveStarted = false;
+      });
+      input.addEventListener("input", () => {
+        if (!paintTarget) return;
+        // Keep fill / text / border selection — wheels only pick the color
+        livePaintValue(paintProp, input.value);
+      });
+      input.addEventListener("change", () => {
+        endLivePaint();
+      });
+    });
+
+    popover.querySelectorAll("[data-uimi-paint-dropper]").forEach((btn) => {
+      btn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const sampleFrom = btn.dataset.uimiPaintDropper;
+        if (!sampleFrom || !paintTarget) return;
+        if (window.EyeDropper) {
+          try {
+            const result = await new window.EyeDropper().open();
+            const hex = toWheelHex(result.sRGBHex, "#ffffff");
+            setPaintClipboard(hex);
+            applyPaintValue(paintProp, hex);
+            clearSampleMode();
+            return;
+          } catch {
+            /* user cancelled — fall through to element sample */
+          }
+        }
+        setSampleMode(paintSampleProp === sampleFrom ? null : sampleFrom);
+      });
+    });
+
+    popover.querySelector("[data-uimi-paint-clip-hex]")?.addEventListener("click", () => {
+      if (!paintClipboard || !paintTarget) return;
+      applyPaintValue(paintProp, paintClipboard);
+    });
+
+    popover.querySelector("[data-uimi-paint-clip-hex]")?.addEventListener("dblclick", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      addClipboardToSwatch();
+    });
+
+    popover.querySelector("[data-uimi-paint-swatch-add]")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      addClipboardToSwatch();
+    });
+
     popover.querySelector("[data-uimi-paint-close]")?.addEventListener("click", closePaintPop);
     popover.querySelector("[data-uimi-paint-clear-one]")?.addEventListener("click", () => {
       if (!paintTarget) return;
@@ -1580,7 +1796,7 @@
     swatchRoot.addEventListener("pointerover", (event) => {
       const chip = event.target.closest(".uimi-paint-pop__chip");
       if (!chip || !paintTarget) return;
-      showPaintPreview(chip.dataset.hex);
+      showPaintPreview(chip.dataset.hex, paintProp);
     });
 
     swatchRoot.addEventListener("pointerleave", clearPaintPreview);
@@ -1588,30 +1804,48 @@
     swatchRoot.addEventListener("click", (event) => {
       const chip = event.target.closest(".uimi-paint-pop__chip");
       if (!chip || !paintTarget) return;
-      const id = ensurePaintId(paintTarget);
-      pushPaintHistory();
-      paintMap[id] = { ...(paintMap[id] || {}), [paintProp]: chip.dataset.hex };
-      clearPaintPreview();
-      renderPaintSheet();
-      syncPaintChips();
+      endLivePaint();
+      applyPaintValue(paintProp, chip.dataset.hex);
     });
 
     document.addEventListener(
       "click",
       (event) => {
         if (root.getAttribute("data-uimi-paint-mode") !== "on") return;
+        if (root.getAttribute("data-uimi-move-mode") === "on") return;
         if (event.target.closest(".uimi-studio, .uimi-paint-pop")) return;
-        const el = event.target.closest("[data-uimi-paint], .uimi-app .uimi-card, .uimi-app .uimi-btn, .uimi-app .uimi-auth, .uimi-app .uimi-auth-brand, .uimi-app .uimi-auth-card, .uimi-app .uimi-auth-bar, .uimi-app .uimi-banner, .uimi-app .uimi-sidebar, .uimi-app .uimi-navbar, .uimi-app .uimi-topbar, .uimi-app .uimi-input, .uimi-app .uimi-note, .uimi-app .uimi-alert, .uimi-app .uimi-badge, .uimi-app .uimi-table, .uimi-app .uimi-display, .uimi-app .uimi-kicker, .uimi-app .uimi-muted, .uimi-app .uimi-label, .uimi-app .uimi-link, .uimi-app .uimi-mark");
-        if (!el || el.closest(".uimi-studio")) return;
+        let el = event.target.closest(".uimi-app *");
+        if (!el || el.closest(".uimi-studio") || el.classList.contains("uimi-app")) return;
+        if (el.classList.contains("uimi-auth-slant") || el.closest(".uimi-auth-slant")) {
+          el = el.closest(".uimi-auth-brand") || el;
+        }
+        if (el.closest("svg")) {
+          el = el.closest("[data-uimi-paint], .uimi-chart, .uimi-icon, .uimi-mark, .uimi-btn, .uimi-card") || el;
+        }
         event.preventDefault();
         event.stopPropagation();
+        if (paintSampleProp && paintTarget) {
+          const hex = sampleColorFromElement(el, paintSampleProp);
+          if (hex) {
+            setPaintClipboard(hex);
+            applyPaintValue(paintProp, hex);
+          }
+          clearSampleMode();
+          return;
+        }
         openPaintPop(el, event);
       },
       true
     );
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closePaintPop();
+      if (event.key === "Escape") {
+        if (paintSampleProp) {
+          clearSampleMode();
+          return;
+        }
+        closePaintPop();
+      }
       const mod = event.metaKey || event.ctrlKey;
       if (mod && event.key.toLowerCase() === "z" && !event.shiftKey) {
         if (paintHistory.length) {
@@ -1628,14 +1862,1191 @@
     });
 
     window.addEventListener("beforeunload", (event) => {
-      if (!paintIsDirty()) return;
+      if (!paintIsDirty() && !(typeof moveIsDirty === "function" && moveIsDirty())) return;
       event.preventDefault();
       event.returnValue = "";
+    });
+
+    const MOVE_KEY = "uimi-move-map";
+    const moveSheet = document.createElement("style");
+    moveSheet.id = "uimi-move-sheet";
+    document.head.appendChild(moveSheet);
+
+    const loadMoveMap = () => {
+      try {
+        return JSON.parse(localStorage.getItem(MOVE_KEY) || "{}") || {};
+      } catch {
+        return {};
+      }
+    };
+
+    let moveSaved = clonePaintMap(loadMoveMap());
+    let moveMap = clonePaintMap(moveSaved);
+    let moveHistory = [];
+    let moveDrag = null;
+
+    const moveIsDirty = () => JSON.stringify(moveMap) !== JSON.stringify(moveSaved);
+
+    const refreshMoveUi = () => {
+      const count = Object.keys(moveMap).length;
+      const dirty = moveIsDirty();
+      window.__UIMI_MOVE__ = clonePaintMap(moveSaved);
+      window.__UIMI_MOVE_DRAFT__ = clonePaintMap(moveMap);
+      document.querySelectorAll("[data-uimi-move-count]").forEach((el) => {
+        el.textContent = `${count} move${count === 1 ? "" : "s"}`;
+      });
+      document.querySelectorAll("[data-uimi-move-status]").forEach((el) => {
+        el.hidden = !dirty;
+      });
+      document.querySelectorAll("[data-uimi-move-save]").forEach((btn) => {
+        btn.disabled = !dirty;
+      });
+      document.querySelectorAll("[data-uimi-move-undo]").forEach((btn) => {
+        btn.disabled = moveHistory.length === 0;
+      });
+    };
+
+    const renderMoveSheet = () => {
+      const rules = Object.entries(moveMap).map(([id, pos]) => {
+        if (!pos) return "";
+        const x = Number(pos.x) || 0;
+        const y = Number(pos.y) || 0;
+        if (!x && !y) return "";
+        return `[data-uimi-paint="${id}"]{position:relative !important;left:${x}px !important;top:${y}px !important;z-index:6 !important;}`;
+      });
+      moveSheet.textContent = rules.filter(Boolean).join("\n");
+      refreshMoveUi();
+    };
+
+    const pushMoveHistory = () => {
+      moveHistory.push(clonePaintMap(moveMap));
+      if (moveHistory.length > 80) moveHistory.shift();
+    };
+
+    const persistMove = () => {
+      moveSaved = clonePaintMap(moveMap);
+      moveMap = clonePaintMap(moveSaved);
+      try {
+        localStorage.setItem(MOVE_KEY, JSON.stringify(moveSaved));
+      } catch {
+        /* ignore quota / private mode */
+      }
+      moveHistory = [];
+      renderMoveSheet();
+      document.querySelectorAll("[data-uimi-move-save]").forEach((btn) => {
+        const prior = btn.textContent;
+        btn.textContent = "Saved";
+        window.setTimeout(() => {
+          btn.textContent = prior;
+        }, 1400);
+      });
+    };
+
+    const revertMove = () => {
+      moveMap = clonePaintMap(moveSaved);
+      moveHistory = [];
+      renderMoveSheet();
+    };
+
+    const undoMove = () => {
+      if (!moveHistory.length) return;
+      moveMap = moveHistory.pop();
+      renderMoveSheet();
+    };
+
+    const paintPathFor = (el) => {
+      if (!el || el.nodeType !== 1) return "";
+      const parts = [];
+      let node = el;
+      while (node && node.nodeType === 1 && parts.length < 10) {
+        if (node.id) {
+          parts.unshift(`#${CSS.escape(node.id)}`);
+          break;
+        }
+        const parent = node.parentElement;
+        if (!parent) {
+          parts.unshift(node.tagName.toLowerCase());
+          break;
+        }
+        const index = [...parent.children].indexOf(node) + 1;
+        parts.unshift(`${node.tagName.toLowerCase()}:nth-child(${index})`);
+        node = parent;
+        if (node.classList?.contains("uimi-app")) {
+          parts.unshift(".uimi-app");
+          break;
+        }
+      }
+      return parts.join(">");
+    };
+
+    const hydrateMoveTargets = () => {
+      seedPaintTargets();
+      Object.entries(moveMap).forEach(([id, pos]) => {
+        if (document.querySelector(`[data-uimi-paint="${id}"]`)) return;
+        const sel = pos?.sel;
+        if (!sel) return;
+        try {
+          const el = document.querySelector(sel);
+          if (el && !el.closest(".uimi-studio")) {
+            el.dataset.uimiPaint = id;
+          }
+        } catch {
+          /* invalid selector */
+        }
+      });
+    };
+
+    const setMoveMode = (on) => {
+      // Keep positions: save drafts when leaving Move instead of discarding
+      if (!on && moveIsDirty()) {
+        persistMove();
+      }
+      if (on) setPaintMode(false);
+      if (on && typeof window.__UIMI_HIDE_GLASS_UI__ === "function") {
+        window.__UIMI_HIDE_GLASS_UI__();
+      }
+      root.setAttribute("data-uimi-move-mode", on ? "on" : "off");
+      document.querySelectorAll("[data-uimi-move-toggle]").forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(on));
+        btn.textContent = on ? "On" : "Off";
+      });
+      if (!on) {
+        moveDrag = null;
+        document.querySelectorAll(".uimi-move-hot").forEach((el) => el.classList.remove("uimi-move-hot"));
+        hydrateMoveTargets();
+        renderMoveSheet();
+      }
+    };
+    window.__UIMI_SET_MOVE_MODE__ = setMoveMode;
+    window.__UIMI_CLEAR_MOVE__ = () => {
+      moveSaved = {};
+      moveMap = {};
+      moveHistory = [];
+      localStorage.removeItem(MOVE_KEY);
+      moveSheet.textContent = "";
+      refreshMoveUi();
+    };
+
+    hydrateMoveTargets();
+    renderMoveSheet();
+    setMoveMode(false);
+
+    document.querySelectorAll("[data-uimi-move-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setMoveMode(root.getAttribute("data-uimi-move-mode") !== "on");
+      });
+    });
+
+    document.querySelectorAll("[data-uimi-move-save]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!moveIsDirty()) return;
+        persistMove();
+      });
+    });
+
+    document.querySelectorAll("[data-uimi-move-undo]").forEach((btn) => {
+      btn.addEventListener("click", () => undoMove());
+    });
+
+    document.querySelectorAll("[data-uimi-move-clear]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pushMoveHistory();
+        moveMap = {};
+        moveSaved = {};
+        try {
+          localStorage.removeItem(MOVE_KEY);
+        } catch {
+          /* ignore */
+        }
+        renderMoveSheet();
+      });
+    });
+
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (root.getAttribute("data-uimi-move-mode") !== "on") return;
+        if (event.button !== 0) return;
+        if (event.target.closest(".uimi-studio, .uimi-paint-pop")) return;
+        let el = event.target.closest(".uimi-app *");
+        if (!el || el.closest(".uimi-studio") || el.classList.contains("uimi-app")) return;
+        if (el.classList.contains("uimi-auth-slant") || el.closest(".uimi-auth-slant")) {
+          el = el.closest(".uimi-auth-brand") || el;
+        }
+        if (el.closest("svg")) {
+          el = el.closest("[data-uimi-paint], .uimi-chart, .uimi-icon, .uimi-mark, .uimi-btn, .uimi-card") || el;
+        }
+        event.preventDefault();
+        const id = ensurePaintId(el);
+        const current = moveMap[id] || { x: 0, y: 0 };
+        pushMoveHistory();
+        moveDrag = {
+          el,
+          id,
+          sel: paintPathFor(el),
+          startX: event.clientX,
+          startY: event.clientY,
+          originX: Number(current.x) || 0,
+          originY: Number(current.y) || 0,
+          moved: false,
+          historyPushed: true,
+        };
+        document.querySelectorAll(".uimi-move-hot").forEach((node) => node.classList.remove("uimi-move-hot"));
+        el.classList.add("uimi-move-hot");
+        el.setPointerCapture?.(event.pointerId);
+      },
+      true
+    );
+
+    window.addEventListener("pointermove", (event) => {
+      if (!moveDrag) return;
+      const dx = event.clientX - moveDrag.startX;
+      const dy = event.clientY - moveDrag.startY;
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moveDrag.moved = true;
+      const x = Math.round(moveDrag.originX + dx);
+      const y = Math.round(moveDrag.originY + dy);
+      moveMap[moveDrag.id] = { x, y, sel: moveDrag.sel || paintPathFor(moveDrag.el) };
+      renderMoveSheet();
+    });
+
+    window.addEventListener("pointerup", () => {
+      if (!moveDrag) return;
+      if (!moveDrag.moved && moveDrag.historyPushed) {
+        // No drag — drop empty history entry
+        moveHistory.pop();
+      } else if (moveDrag.moved) {
+        const final = moveMap[moveDrag.id] || { x: 0, y: 0 };
+        if (!final.x && !final.y) delete moveMap[moveDrag.id];
+        else {
+          moveMap[moveDrag.id] = {
+            x: Number(final.x) || 0,
+            y: Number(final.y) || 0,
+            sel: final.sel || moveDrag.sel || paintPathFor(moveDrag.el),
+          };
+        }
+        renderMoveSheet();
+      }
+      moveDrag.el?.classList.remove("uimi-move-hot");
+      moveDrag = null;
+    });
+
+    window.addEventListener("pointercancel", () => {
+      if (!moveDrag) return;
+      if (moveDrag.historyPushed) {
+        undoMove();
+      }
+      moveDrag.el?.classList.remove("uimi-move-hot");
+      moveDrag = null;
+    });
+
+    const GLASS_MAP_KEY = "uimi-glass-map";
+    const GLASS_MODE_KEY = "uimi-glass-mode";
+    const GLASS_BG_KEY = "uimi-glass-bg";
+    const GLASS_BG_IDS = ["mist", "porcelain", "slate", "graphite"];
+    const GLASS_BG_PAIR = { mist: "slate", porcelain: "graphite", slate: "mist", graphite: "porcelain" };
+    const isDarkPalette = () => root.getAttribute("data-uimi-palette") === "midnight";
+    const defaultGlassBg = () => (isDarkPalette() ? "slate" : "mist");
+    // Default chrome when turning Glass On with an empty map (iPhone-like master switch)
+    const GLASS_DEFAULT_KEYS = [
+      "uimi-card",
+      "uimi-navbar",
+      "uimi-sidebar",
+      "uimi-auth-card",
+      "uimi-banner",
+      "uimi-stat",
+      "uimi-table-wrap",
+      "uimi-notify-panel",
+    ];
+    // Optical presets from shayxo LiquidGlass research table
+    // https://liquidglass.shayxo.dev/research/parameters/
+    // Mapped into UIMi CSS slider units (blur px, tint %, specular 0–100, etc.)
+    const GLASS_PRESET_KEYS = ["regular", "clear", "chrome", "thick"];
+    const GLASS_PRESET_OPTICS = [
+      "thickness",
+      "bezel",
+      "ior",
+      "scale",
+      "blur",
+      "specular",
+      "specSat",
+      "tint",
+      "tintColor",
+      "innerColor",
+      "innerBlur",
+      "innerSpread",
+      "outerBlur",
+      "depth",
+      "refract",
+    ];
+    const glassPresets = {
+      regular: {
+        thickness: 45,
+        bezel: 18,
+        ior: 1.5,
+        scale: 1,
+        blur: 10,
+        specular: 55,
+        specSat: 160,
+        tint: 10,
+        tintColor: "#ffffff",
+        innerColor: "#0f1624",
+        innerBlur: 14,
+        innerSpread: -5,
+        outerBlur: 18,
+        depth: 35,
+        refract: 12,
+      },
+      clear: {
+        thickness: 40,
+        bezel: 16,
+        ior: 1.5,
+        scale: 1,
+        blur: 4,
+        specular: 70,
+        specSat: 170,
+        tint: 4,
+        tintColor: "#ffffff",
+        innerColor: "#0f1624",
+        innerBlur: 10,
+        innerSpread: -4,
+        outerBlur: 14,
+        depth: 40,
+        refract: 14,
+      },
+      chrome: {
+        thickness: 30,
+        bezel: 12,
+        ior: 1.5,
+        scale: 1,
+        blur: 14,
+        specular: 50,
+        specSat: 140,
+        tint: 11,
+        tintColor: "#ffffff",
+        innerColor: "#0f1624",
+        innerBlur: 10,
+        innerSpread: -4,
+        outerBlur: 12,
+        depth: 22,
+        refract: 8,
+      },
+      thick: {
+        thickness: 70,
+        bezel: 24,
+        ior: 1.5,
+        scale: 1.05,
+        blur: 16,
+        specular: 45,
+        specSat: 170,
+        tint: 13,
+        tintColor: "#ffffff",
+        innerColor: "#0f1624",
+        innerBlur: 20,
+        innerSpread: -6,
+        outerBlur: 28,
+        depth: 55,
+        refract: 10,
+      },
+    };
+    const themeInkHex = () => {
+      try {
+        const raw = getComputedStyle(root).getPropertyValue("--uimi-ink").trim();
+        const hex = toWheelHex(raw, "");
+        if (/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+      } catch {
+        /* fall through */
+      }
+      return isDarkPalette() ? "#e8eef8" : "#111111";
+    };
+    const glassDefaults = {
+      radius: 4,
+      textColor: themeInkHex(),
+      ...glassPresets.regular,
+    };
+    const GLASS_COLOR_PARAMS = new Set(["tintColor", "innerColor", "textColor"]);
+    const GLASS_SURFACES =
+      ".uimi-card, .uimi-btn, .uimi-banner, .uimi-note, .uimi-alert, .uimi-auth-card, .uimi-auth-brand, .uimi-sidebar, .uimi-navbar, .uimi-stat, .uimi-input, .uimi-badge, .uimi-table-wrap, .uimi-notify-panel, .uimi-page";
+    const GLASS_CLASS_PRIORITY = [
+      "uimi-btn--primary",
+      "uimi-btn--info",
+      "uimi-btn--success",
+      "uimi-btn--warning",
+      "uimi-btn--danger",
+      "uimi-btn--ghost",
+      "uimi-btn",
+      "uimi-card",
+      "uimi-banner",
+      "uimi-note",
+      "uimi-alert",
+      "uimi-auth-card",
+      "uimi-auth-brand",
+      "uimi-sidebar",
+      "uimi-navbar",
+      "uimi-stat",
+      "uimi-input",
+      "uimi-badge",
+      "uimi-table-wrap",
+      "uimi-notify-panel",
+      "uimi-page",
+    ];
+
+    const loadGlassMap = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem(GLASS_MAP_KEY) || "{}");
+        if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+        // Drop legacy paint-id entries
+        const next = {};
+        Object.entries(raw).forEach(([key, value]) => {
+          if (!key || key.includes(":") || !value || typeof value !== "object" || value.sel) return;
+          next[key] = { ...glassDefaults, ...value };
+        });
+        return next;
+      } catch {
+        return {};
+      }
+    };
+
+    let glassMap = loadGlassMap();
+    let glassMode = localStorage.getItem(GLASS_MODE_KEY) === "on" ? "on" : "off";
+    let glassTarget = null;
+    let glassClassKey = "";
+    let glassDraft = { ...glassDefaults };
+    let glassDrag = null;
+    let glassPanelPos = null;
+
+    const glassSheet = document.createElement("style");
+    glassSheet.id = "uimi-glass-sheet";
+    document.head.appendChild(glassSheet);
+
+    const gear = document.createElement("button");
+    gear.type = "button";
+    gear.className = "uimi-glass-gear";
+    gear.hidden = true;
+    gear.setAttribute("data-uimi-kit", "authoring");
+    gear.setAttribute("aria-label", "Liquid glass settings");
+    gear.innerHTML = '<span class="uimi-icon uimi-icon-settings" aria-hidden="true"></span>';
+    document.body.appendChild(gear);
+
+    const modal = document.createElement("div");
+    modal.className = "uimi-glass-modal";
+    modal.hidden = true;
+    modal.setAttribute("data-uimi-kit", "authoring");
+    modal.innerHTML = `
+      <div class="uimi-glass-modal__panel" role="dialog" aria-modal="true" aria-labelledby="uimi-glass-title">
+        <div class="uimi-glass-modal__head" data-uimi-glass-drag>
+          <span class="uimi-glass-modal__grip" aria-hidden="true"></span>
+          <div>
+            <strong id="uimi-glass-title">Liquid Glass</strong>
+            <span data-uimi-glass-class></span>
+          </div>
+          <button type="button" class="uimi-glass-modal__close" data-uimi-glass-close aria-label="Close">×</button>
+        </div>
+        <div class="uimi-glass-modal__rows">
+          <div class="uimi-glass-modal__section">Preset</div>
+          <div class="uimi-glass-modal__presets" role="group" aria-label="Liquid Glass presets">
+            <button type="button" class="uimi-glass-modal__preset" data-uimi-glass-preset="regular" aria-pressed="true">Regular</button>
+            <button type="button" class="uimi-glass-modal__preset" data-uimi-glass-preset="clear" aria-pressed="false">Clear</button>
+            <button type="button" class="uimi-glass-modal__preset" data-uimi-glass-preset="chrome" aria-pressed="false">Chrome</button>
+            <button type="button" class="uimi-glass-modal__preset" data-uimi-glass-preset="thick" aria-pressed="false">Thick</button>
+          </div>
+
+          <!-- Customization controls hidden for now
+          <div class="uimi-glass-modal__section">Shape</div>
+          <label class="uimi-glass-modal__row"><span>Radius</span><input type="range" data-uimi-glass-param="radius" min="0" max="48" step="1" /><output data-uimi-glass-out="radius"></output></label>
+
+          <div class="uimi-glass-modal__section">Refraction</div>
+          <label class="uimi-glass-modal__row"><span>Thickness</span><input type="range" data-uimi-glass-param="thickness" min="10" max="100" step="1" /><output data-uimi-glass-out="thickness"></output></label>
+          <label class="uimi-glass-modal__row"><span>Bezel</span><input type="range" data-uimi-glass-param="bezel" min="0" max="100" step="1" /><output data-uimi-glass-out="bezel"></output></label>
+          <label class="uimi-glass-modal__row"><span>IOR</span><input type="range" data-uimi-glass-param="ior" min="1" max="3" step="0.05" /><output data-uimi-glass-out="ior"></output></label>
+          <label class="uimi-glass-modal__row"><span>Scale</span><input type="range" data-uimi-glass-param="scale" min="0.5" max="2" step="0.05" /><output data-uimi-glass-out="scale"></output></label>
+          <label class="uimi-glass-modal__row"><span>Lens</span><input type="range" data-uimi-glass-param="refract" min="0" max="24" step="1" /><output data-uimi-glass-out="refract"></output></label>
+
+          <div class="uimi-glass-modal__section">Appearance</div>
+          <label class="uimi-glass-modal__row"><span>Blur</span><input type="range" data-uimi-glass-param="blur" min="4" max="48" step="1" /><output data-uimi-glass-out="blur"></output></label>
+          <label class="uimi-glass-modal__row"><span>Spec op</span><input type="range" data-uimi-glass-param="specular" min="0" max="100" step="1" /><output data-uimi-glass-out="specular"></output></label>
+          <label class="uimi-glass-modal__row"><span>Spec sat</span><input type="range" data-uimi-glass-param="specSat" min="50" max="300" step="5" /><output data-uimi-glass-out="specSat"></output></label>
+          <label class="uimi-glass-modal__row"><span>Depth</span><input type="range" data-uimi-glass-param="depth" min="0" max="100" step="1" /><output data-uimi-glass-out="depth"></output></label>
+          <label class="uimi-glass-modal__row"><span>Text</span><input type="color" data-uimi-glass-param="textColor" /><output data-uimi-glass-out="textColor"></output></label>
+
+          <div class="uimi-glass-modal__section">Inner shadow</div>
+          <label class="uimi-glass-modal__row"><span>Color</span><input type="color" data-uimi-glass-param="innerColor" /><output data-uimi-glass-out="innerColor"></output></label>
+          <label class="uimi-glass-modal__row"><span>Blur</span><input type="range" data-uimi-glass-param="innerBlur" min="0" max="48" step="1" /><output data-uimi-glass-out="innerBlur"></output></label>
+          <label class="uimi-glass-modal__row"><span>Spread</span><input type="range" data-uimi-glass-param="innerSpread" min="-20" max="20" step="1" /><output data-uimi-glass-out="innerSpread"></output></label>
+
+          <div class="uimi-glass-modal__section">Tint</div>
+          <label class="uimi-glass-modal__row"><span>Color</span><input type="color" data-uimi-glass-param="tintColor" /><output data-uimi-glass-out="tintColor"></output></label>
+          <label class="uimi-glass-modal__row"><span>Opacity</span><input type="range" data-uimi-glass-param="tint" min="0" max="40" step="1" /><output data-uimi-glass-out="tint"></output></label>
+
+          <div class="uimi-glass-modal__section">Outer shadow</div>
+          <label class="uimi-glass-modal__row"><span>Blur</span><input type="range" data-uimi-glass-param="outerBlur" min="0" max="64" step="1" /><output data-uimi-glass-out="outerBlur"></output></label>
+
+          <div class="uimi-glass-modal__section">Background</div>
+          <div class="uimi-glass-modal__bg" role="group" aria-label="Glass background">
+            <button type="button" class="uimi-glass-modal__bg-btn" data-uimi-glass-bg="mist" aria-pressed="false"><span class="uimi-glass-modal__bg-swatch" aria-hidden="true"></span><span>Mist · cool</span></button>
+            <button type="button" class="uimi-glass-modal__bg-btn" data-uimi-glass-bg="porcelain" aria-pressed="false"><span class="uimi-glass-modal__bg-swatch" aria-hidden="true"></span><span>Porcelain · warm</span></button>
+            <button type="button" class="uimi-glass-modal__bg-btn" data-uimi-glass-bg="slate" aria-pressed="false"><span class="uimi-glass-modal__bg-swatch" aria-hidden="true"></span><span>Slate · cool</span></button>
+            <button type="button" class="uimi-glass-modal__bg-btn" data-uimi-glass-bg="graphite" aria-pressed="false"><span class="uimi-glass-modal__bg-swatch" aria-hidden="true"></span><span>Graphite · warm</span></button>
+          </div>
+          -->
+        </div>
+        <div class="uimi-glass-modal__foot">
+          <button type="button" data-uimi-glass-apply>Apply to class</button>
+          <button type="button" data-uimi-glass-apply-all>Apply to all</button>
+          <button type="button" data-uimi-glass-remove>Remove</button>
+          <button type="button" data-uimi-glass-defaults>Defaults</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const hexToRgbTriplet = (hex) => {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return "255, 255, 255";
+      return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+    };
+
+    const settingsToVars = (settings) => {
+      const nativeRadius =
+        typeof settings.radiusValue === "string" && settings.radiusValue.trim()
+          ? settings.radiusValue.trim()
+          : "";
+      const radius =
+        settings.radius === "native" && nativeRadius
+          ? nativeRadius
+          : `${Math.max(0, Number(settings.radius) || 0)}px`;
+      const thickness = Math.max(0, Math.min(100, Number(settings.thickness) || 0)) / 100;
+      const bezel = Math.max(0, Math.min(100, Number(settings.bezel) || 0)) / 100;
+      const ior = Math.max(1, Math.min(3, Number(settings.ior) || glassDefaults.ior));
+      const scale = Math.max(0.5, Math.min(2, Number(settings.scale) || 1));
+      const blur = Math.max(4, Number(settings.blur) || glassDefaults.blur);
+      const tint = Math.max(0, Math.min(100, Number(settings.tint) || 0));
+      const specular = Math.max(0, Math.min(100, Number(settings.specular) || 0)) / 100;
+      const specSat = Math.max(0.5, Math.min(3, (Number(settings.specSat) || glassDefaults.specSat) / 100));
+      const depth = Math.max(0, Math.min(100, Number(settings.depth) || 0)) / 100;
+      const refract = Math.max(0, Math.min(24, Number(settings.refract) || 0));
+      const tintColor = /^#[0-9a-f]{6}$/i.test(settings.tintColor) ? settings.tintColor : glassDefaults.tintColor;
+      const textColor = /^#[0-9a-f]{6}$/i.test(settings.textColor) ? settings.textColor : glassDefaults.textColor;
+      const innerColor = /^#[0-9a-f]{6}$/i.test(settings.innerColor) ? settings.innerColor : glassDefaults.innerColor;
+      const innerBlur = Math.max(0, Number(settings.innerBlur) || 0);
+      const innerSpread = Number(settings.innerSpread) || 0;
+      const outerBlur = Math.max(0, Number(settings.outerBlur) || 0);
+      return {
+        "--uimi-glass-radius": radius,
+        "--uimi-glass-thickness": String(thickness),
+        "--uimi-glass-bezel": String(bezel),
+        "--uimi-glass-ior": String(ior),
+        "--uimi-glass-scale": String(scale),
+        "--uimi-glass-blur": `${blur}px`,
+        "--uimi-glass-tint-opacity": String(tint / 100),
+        "--uimi-glass-tint": hexToRgbTriplet(tintColor),
+        "--uimi-glass-text": textColor,
+        "--uimi-glass-text-shadow": "none",
+        "--uimi-glass-specular": String(specular),
+        "--uimi-glass-spec-sat": String(specSat),
+        "--uimi-glass-depth": String(depth),
+        "--uimi-glass-stroke": String(0.22 + bezel * 0.35 + specular * 0.2),
+        "--uimi-glass-shadow": String(0.1 + depth * 0.22 + outerBlur / 200),
+        "--uimi-glass-saturate": String(1.15 + ior * 0.18 + refract * 0.03 + specular * 0.12),
+        "--uimi-glass-brightness": String(1.02 + specular * 0.1 + thickness * 0.04),
+        "--uimi-glass-contrast": String(1.01 + depth * 0.05 + (ior - 1) * 0.04 + refract * 0.01),
+        "--uimi-glass-refract": String(refract),
+        "--uimi-glass-inner-color": hexToRgbTriplet(innerColor),
+        "--uimi-glass-inner-blur": `${innerBlur}px`,
+        "--uimi-glass-inner-spread": `${innerSpread}px`,
+        "--uimi-glass-outer-blur": `${outerBlur}px`,
+      };
+    };
+
+    const persistGlassMap = () => {
+      localStorage.setItem(GLASS_MAP_KEY, JSON.stringify(glassMap));
+    };
+
+    const syncGlassBgButtons = (id) => {
+      modal.querySelectorAll("[data-uimi-glass-bg]").forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.uimiGlassBg === id));
+      });
+    };
+
+    const applyGlassBg = (id, { persist = true } = {}) => {
+      const next = GLASS_BG_IDS.includes(id) ? id : defaultGlassBg();
+      root.setAttribute("data-uimi-glass-bg", next);
+      if (persist) localStorage.setItem(GLASS_BG_KEY, next);
+      syncGlassBgButtons(next);
+      return next;
+    };
+
+    const loadGlassBg = () => {
+      const saved = localStorage.getItem(GLASS_BG_KEY);
+      return GLASS_BG_IDS.includes(saved) ? saved : defaultGlassBg();
+    };
+
+    const remapGlassBgForPalette = () => {
+      const saved = localStorage.getItem(GLASS_BG_KEY);
+      if (!GLASS_BG_IDS.includes(saved)) {
+        applyGlassBg(defaultGlassBg());
+        return;
+      }
+      const darkBg = saved === "slate" || saved === "graphite";
+      if (isDarkPalette() && !darkBg) applyGlassBg(GLASS_BG_PAIR[saved] || "slate");
+      else if (!isDarkPalette() && darkBg) applyGlassBg(GLASS_BG_PAIR[saved] || "mist");
+      else applyGlassBg(saved);
+    };
+
+    const syncGlassModeButtons = () => {
+      document.querySelectorAll("[data-uimi-glass-mode]").forEach((btn) => {
+        btn.setAttribute("aria-pressed", btn.dataset.uimiGlassMode === glassMode ? "true" : "false");
+      });
+    };
+
+    const refreshGlassCount = () => {
+      const count = Object.keys(glassMap).length;
+      const active = glassMode === "on" && count > 0;
+      root.setAttribute("data-uimi-glass", glassMode);
+      root.setAttribute("data-uimi-has-glass", active ? "on" : "off");
+      document.querySelectorAll("[data-uimi-glass-count]").forEach((el) => {
+        el.textContent = glassMode === "off" ? "off" : `${count} glass`;
+      });
+      syncGlassModeButtons();
+    };
+
+    const renderGlassSheet = () => {
+      if (glassMode !== "on") {
+        glassSheet.textContent = "";
+        refreshGlassCount();
+        return;
+      }
+      const rules = Object.entries(glassMap).map(([key, settings]) => {
+        const vars = settingsToVars(settings);
+        const decls = Object.entries(vars)
+          .map(([name, value]) => `${name}:${value}`)
+          .join(";");
+        return `.uimi-app .${CSS.escape(key)}.uimi-glass{${decls}}`;
+      });
+      glassSheet.textContent = rules.join("\n");
+      refreshGlassCount();
+    };
+
+    const stripGlassClasses = () => {
+      document.querySelectorAll(".uimi-app .uimi-glass").forEach((el) => el.classList.remove("uimi-glass"));
+      document.querySelectorAll(".uimi-glass-hot").forEach((el) => el.classList.remove("uimi-glass-hot"));
+      hideGlassGear();
+      closeGlassModal({ revert: false });
+    };
+
+    const seedDefaultGlassMap = () => {
+      GLASS_DEFAULT_KEYS.forEach((key) => {
+        const els = targetsForClass(key).filter((el) => !isNestedGlassChild(el));
+        if (!els.length) return;
+        glassMap[key] = tailorGlassForClass(key, glassPresets.regular, els[0]);
+      });
+      persistGlassMap();
+    };
+
+    const setGlassMode = (next, { seed = true } = {}) => {
+      glassMode = next === "on" ? "on" : "off";
+      localStorage.setItem(GLASS_MODE_KEY, glassMode);
+      root.setAttribute("data-uimi-glass", glassMode);
+      if (glassMode === "off") {
+        stripGlassClasses();
+        renderGlassSheet();
+        return;
+      }
+      if (seed && !Object.keys(glassMap).length) seedDefaultGlassMap();
+      hydrateGlassTargets();
+    };
+
+    const resolveGlassSurface = (el) => {
+      if (!el || !el.closest) return null;
+      if (el.closest(".uimi-studio, .uimi-paint-pop, .uimi-glass-gear, .uimi-glass-modal, .uimi-copy-fab")) return null;
+      let node = el.closest(".uimi-app *");
+      if (!node || node.classList.contains("uimi-app")) return null;
+      if (node.classList.contains("uimi-auth-slant") || node.closest(".uimi-auth-slant")) {
+        node = node.closest(".uimi-auth-brand") || node;
+      }
+      if (node.closest("svg")) {
+        node = node.closest(GLASS_SURFACES) || node.closest("[data-uimi-paint], .uimi-btn, .uimi-card") || node;
+      }
+      return node.closest(GLASS_SURFACES) || node;
+    };
+
+    const glassClassFor = (el) => {
+      for (const name of GLASS_CLASS_PRIORITY) {
+        if (el.classList.contains(name)) return name;
+      }
+      const uimi = [...el.classList].find((name) => name.startsWith("uimi-") && name !== "uimi-glass");
+      return uimi || el.tagName.toLowerCase();
+    };
+
+    const targetsForClass = (key) => {
+      try {
+        return [...document.querySelectorAll(`.uimi-app .${CSS.escape(key)}`)];
+      } catch {
+        return [];
+      }
+    };
+
+    const applyClassGlass = (key, settings, { persist = true } = {}) => {
+      if (!key) return;
+      if (glassMode !== "on") {
+        glassMode = "on";
+        localStorage.setItem(GLASS_MODE_KEY, "on");
+        root.setAttribute("data-uimi-glass", "on");
+        syncGlassModeButtons();
+      }
+      glassMap[key] = { ...glassDefaults, ...settings };
+      targetsForClass(key).forEach((el) => el.classList.add("uimi-glass"));
+      renderGlassSheet();
+      if (persist) persistGlassMap();
+    };
+
+    // Panels/shell that own nested controls — don't double-glass children inside these
+    const GLASS_NEST_HOSTS =
+      ".uimi-card, .uimi-banner, .uimi-note, .uimi-alert, .uimi-auth-card, .uimi-auth-brand, .uimi-table-wrap, .uimi-notify-panel, .uimi-stat, .uimi-sidebar, .uimi-navbar";
+    // Theme chrome for Apply to all — skip page wrappers (they swallow every child)
+    const GLASS_APPLY_ALL_SURFACES =
+      ".uimi-card, .uimi-btn, .uimi-banner, .uimi-note, .uimi-alert, .uimi-auth-card, .uimi-auth-brand, .uimi-sidebar, .uimi-navbar, .uimi-stat, .uimi-input, .uimi-badge, .uimi-table-wrap, .uimi-notify-panel";
+    const GLASS_COMPACT_RE = /^(uimi-btn|uimi-badge|uimi-input|uimi-stat)/;
+
+    const isNestedGlassChild = (el) => {
+      const host = el.parentElement?.closest(GLASS_NEST_HOSTS);
+      return Boolean(host && host !== el);
+    };
+
+    const readNativeRadius = (el) => {
+      try {
+        const value = getComputedStyle(el).borderRadius;
+        return value && value !== "0px" ? value : "0px";
+      } catch {
+        return "0px";
+      }
+    };
+
+    const readNativeTextColor = (el) => {
+      const fallback = themeInkHex();
+      if (!el) return fallback;
+      const hadGlass = el.classList.contains("uimi-glass");
+      if (hadGlass) el.classList.remove("uimi-glass");
+      let hex = fallback;
+      try {
+        hex = toWheelHex(getComputedStyle(el).color, fallback);
+      } catch {
+        hex = fallback;
+      }
+      if (hadGlass) el.classList.add("uimi-glass");
+      // If sampled color fights the theme (e.g. leftover black on midnight), prefer ink
+      const ink = fallback;
+      const sampled = hexToRgb(hex);
+      const inkRgb = hexToRgb(ink);
+      if (sampled && inkRgb) {
+        const sampleLuma = (0.2126 * sampled.r + 0.7152 * sampled.g + 0.0722 * sampled.b) / 255;
+        const inkLuma = (0.2126 * inkRgb.r + 0.7152 * inkRgb.g + 0.0722 * inkRgb.b) / 255;
+        if (Math.abs(sampleLuma - inkLuma) > 0.45) return ink;
+      }
+      return hex;
+    };
+
+    const remapGlassInkForPalette = () => {
+      const ink = themeInkHex();
+      glassDefaults.textColor = ink;
+      let changed = false;
+      Object.keys(glassMap).forEach((key) => {
+        const els = targetsForClass(key);
+        const next = els[0] ? readNativeTextColor(els[0]) : ink;
+        if (glassMap[key]?.textColor !== next) {
+          glassMap[key] = { ...glassMap[key], textColor: next };
+          changed = true;
+        }
+      });
+      if (glassDraft) glassDraft.textColor = ink;
+      if (changed) persistGlassMap();
+      if (glassMode === "on") renderGlassSheet();
+    };
+
+    const tailorGlassForClass = (key, settings, sampleEl) => {
+      const next = { ...glassDefaults, ...settings };
+      next.radius = "native";
+      next.radiusValue = sampleEl ? readNativeRadius(sampleEl) : next.radiusValue || "0px";
+      next.textColor = sampleEl ? readNativeTextColor(sampleEl) : next.textColor || glassDefaults.textColor;
+      if (GLASS_COMPACT_RE.test(key)) {
+        next.blur = Math.min(Number(next.blur) || glassDefaults.blur, 16);
+        next.outerBlur = Math.min(Number(next.outerBlur) || glassDefaults.outerBlur, 18);
+        next.innerBlur = Math.min(Number(next.innerBlur) || glassDefaults.innerBlur, 12);
+        next.refract = Math.min(Number(next.refract) || glassDefaults.refract, 8);
+      }
+      return next;
+    };
+
+    const applyAllGlass = (settings, { persist = true } = {}) => {
+      if (glassMode !== "on") {
+        glassMode = "on";
+        localStorage.setItem(GLASS_MODE_KEY, "on");
+        root.setAttribute("data-uimi-glass", "on");
+        syncGlassModeButtons();
+      }
+      document.querySelectorAll(".uimi-app .uimi-glass").forEach((el) => el.classList.remove("uimi-glass"));
+      glassMap = {};
+
+      const roots = [...document.querySelectorAll(`.uimi-app ${GLASS_APPLY_ALL_SURFACES}`)].filter(
+        (el) => !isNestedGlassChild(el)
+      );
+      const groups = new Map();
+      roots.forEach((el) => {
+        const key = glassClassFor(el);
+        if (!key) return;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(el);
+      });
+
+      groups.forEach((els, key) => {
+        glassMap[key] = tailorGlassForClass(key, settings, els[0]);
+        els.forEach((el) => el.classList.add("uimi-glass"));
+      });
+
+      renderGlassSheet();
+      if (persist) persistGlassMap();
+    };
+
+    const removeClassGlass = (key) => {
+      if (!key || !glassMap[key]) return;
+      delete glassMap[key];
+      targetsForClass(key).forEach((el) => el.classList.remove("uimi-glass"));
+      renderGlassSheet();
+      persistGlassMap();
+    };
+
+    const hydrateGlassTargets = () => {
+      if (glassMode !== "on") {
+        stripGlassClasses();
+        renderGlassSheet();
+        return;
+      }
+      document.querySelectorAll(".uimi-app .uimi-glass").forEach((el) => {
+        const key = glassClassFor(el);
+        if (!glassMap[key]) el.classList.remove("uimi-glass");
+      });
+      let patched = false;
+      Object.keys(glassMap).forEach((key) => {
+        const els = targetsForClass(key);
+        if (!/^#[0-9a-f]{6}$/i.test(glassMap[key]?.textColor) && els[0]) {
+          glassMap[key] = {
+            ...glassMap[key],
+            textColor: readNativeTextColor(els[0]),
+          };
+          patched = true;
+        }
+        els.forEach((el) => el.classList.add("uimi-glass"));
+      });
+      renderGlassSheet();
+      if (patched) persistGlassMap();
+    };
+
+    const clearGlass = () => {
+      glassMap = {};
+      localStorage.removeItem(GLASS_MAP_KEY);
+      document.querySelectorAll(".uimi-glass").forEach((el) => el.classList.remove("uimi-glass"));
+      document.querySelectorAll(".uimi-glass-hot").forEach((el) => el.classList.remove("uimi-glass-hot"));
+      hideGlassGear();
+      closeGlassModal({ revert: false });
+      renderGlassSheet();
+      applyGlassBg(loadGlassBg());
+    };
+
+    const hideGlassGear = () => {
+      gear.hidden = true;
+      document.querySelectorAll(".uimi-glass-hot").forEach((el) => el.classList.remove("uimi-glass-hot"));
+    };
+
+    const placeGlassGear = (el) => {
+      if (!el) return hideGlassGear();
+      glassTarget = el;
+      glassClassKey = glassClassFor(el);
+      document.querySelectorAll(".uimi-glass-hot").forEach((node) => node.classList.remove("uimi-glass-hot"));
+      el.classList.add("uimi-glass-hot");
+      const rect = el.getBoundingClientRect();
+      const size = 34;
+      let left = rect.right - size / 2;
+      let top = rect.top - size / 2;
+      left = Math.min(window.innerWidth - size - 8, Math.max(8, left));
+      top = Math.min(window.innerHeight - size - 8, Math.max(8, top));
+      gear.style.left = `${Math.round(left)}px`;
+      gear.style.top = `${Math.round(top)}px`;
+      gear.hidden = false;
+      gear.dataset.glassClass = glassClassKey;
+      gear.title = `Liquid glass · ${glassClassKey}`;
+    };
+
+    const matchGlassPreset = (settings) => {
+      const hit = GLASS_PRESET_KEYS.find((id) => {
+        const preset = glassPresets[id];
+        return GLASS_PRESET_OPTICS.every((key) => {
+          const a = settings[key];
+          const b = preset[key];
+          if (typeof b === "number") return Number(a) === b;
+          return String(a || "").toLowerCase() === String(b).toLowerCase();
+        });
+      });
+      return hit || "";
+    };
+
+    const syncGlassPresetButtons = () => {
+      const active = matchGlassPreset(glassDraft);
+      modal.querySelectorAll("[data-uimi-glass-preset]").forEach((btn) => {
+        btn.setAttribute("aria-pressed", btn.dataset.uimiGlassPreset === active ? "true" : "false");
+      });
+    };
+
+    const applyGlassPreset = (id) => {
+      const preset = glassPresets[id];
+      if (!preset) return;
+      glassDraft = {
+        ...glassDraft,
+        ...preset,
+        radius: glassDraft.radius,
+        textColor: glassDraft.textColor,
+      };
+      syncGlassModalFields();
+      livePreviewGlass();
+    };
+
+    const syncGlassModalFields = () => {
+      modal.querySelectorAll("[data-uimi-glass-param]").forEach((input) => {
+        const key = input.dataset.uimiGlassParam;
+        if (!(key in glassDraft)) return;
+        input.value = glassDraft[key];
+      });
+      modal.querySelectorAll("[data-uimi-glass-out]").forEach((out) => {
+        const key = out.dataset.uimiGlassOut;
+        const value = glassDraft[key];
+        if (key === "tint") out.textContent = `${value}%`;
+        else if (key === "ior" || key === "scale") out.textContent = Number(value).toFixed(2);
+        else if (key === "specSat") out.textContent = String(value);
+        else if (GLASS_COLOR_PARAMS.has(key)) out.textContent = String(value).toUpperCase();
+        else out.textContent = String(value);
+      });
+      const label = modal.querySelector("[data-uimi-glass-class]");
+      if (label) label.textContent = glassClassKey ? `.${glassClassKey}` : "";
+      syncGlassPresetButtons();
+    };
+
+    const livePreviewGlass = () => {
+      if (!glassClassKey) return;
+      applyClassGlass(glassClassKey, glassDraft, { persist: false });
+    };
+
+    const glassPanel = () => modal.querySelector(".uimi-glass-modal__panel");
+
+    const placeGlassPanel = (preferredX, preferredY) => {
+      const panel = glassPanel();
+      if (!panel) return;
+      modal.hidden = false;
+      const rect = panel.getBoundingClientRect();
+      const pad = 8;
+      let x = preferredX;
+      let y = preferredY;
+      if (x + rect.width > window.innerWidth - pad) x = window.innerWidth - rect.width - pad;
+      if (y + rect.height > window.innerHeight - pad) y = window.innerHeight - rect.height - pad;
+      if (x < pad) x = pad;
+      if (y < pad) y = pad;
+      const next = { x: Math.round(x), y: Math.round(y) };
+      glassPanelPos = next;
+      panel.style.left = `${next.x}px`;
+      panel.style.top = `${next.y}px`;
+    };
+
+    const defaultGlassPanelPos = () => {
+      const gearRect = gear.getBoundingClientRect();
+      const panel = glassPanel();
+      const width = panel?.offsetWidth || 300;
+      const pad = 12;
+      let x = gearRect.right + pad;
+      if (x + width > window.innerWidth - pad) x = gearRect.left - width - pad;
+      if (x < pad) x = pad;
+      return { x, y: Math.max(pad, Math.min(gearRect.top, window.innerHeight - pad - 80)) };
+    };
+
+    const closeGlassModal = ({ revert = true } = {}) => {
+      glassDrag = null;
+      glassPanel()?.classList.remove("is-dragging");
+      modal.hidden = true;
+      if (revert) {
+        glassMap = loadGlassMap();
+        hydrateGlassTargets();
+      }
+    };
+
+    const openGlassModal = () => {
+      if (!glassTarget || !glassClassKey) return;
+      const saved = glassMap[glassClassKey] || {};
+      glassDraft = { ...glassDefaults, ...saved };
+      if (glassDraft.radius === "native") {
+        const parsed = parseFloat(String(glassDraft.radiusValue || ""));
+        glassDraft.radius = Number.isFinite(parsed)
+          ? Math.max(0, Math.min(48, Math.round(parsed > 64 ? 48 : parsed)))
+          : glassDefaults.radius;
+      }
+      delete glassDraft.radiusValue;
+      if (!saved.textColor) {
+        glassDraft.textColor = readNativeTextColor(glassTarget);
+      }
+      syncGlassModalFields();
+      syncGlassBgButtons(loadGlassBg());
+      applyClassGlass(glassClassKey, glassDraft, { persist: false });
+      const pos = glassPanelPos || defaultGlassPanelPos();
+      placeGlassPanel(pos.x, pos.y);
+    };
+
+    window.__UIMI_HIDE_GLASS_UI__ = () => {
+      hideGlassGear();
+      closeGlassModal({ revert: true });
+    };
+
+    window.__UIMI_SYNC_GLASS_BG__ = () => remapGlassBgForPalette();
+
+    const designBusy = () =>
+      root.getAttribute("data-uimi-paint-mode") === "on" || root.getAttribute("data-uimi-move-mode") === "on";
+
+    const selectGlassElement = (event) => {
+      if (glassMode !== "on") return;
+      if (designBusy()) return;
+      if (event.target.closest(".uimi-studio, .uimi-paint-pop, .uimi-glass-gear, .uimi-glass-modal, .uimi-copy-fab")) return;
+      const surface = resolveGlassSurface(event.target);
+      if (!surface) {
+        if (!event.target.closest(".uimi-glass-hot")) hideGlassGear();
+        return;
+      }
+      placeGlassGear(surface);
+    };
+
+    window.__UIMI_CLEAR_GLASS__ = clearGlass;
+    window.__UIMI_SET_GLASS_MODE__ = setGlassMode;
+    window.__UIMI_SYNC_GLASS_INK__ = remapGlassInkForPalette;
+
+    applyGlassBg(loadGlassBg());
+    remapGlassInkForPalette();
+    setGlassMode(glassMode, { seed: false });
+
+    document.querySelectorAll("[data-uimi-glass-mode]").forEach((btn) => {
+      btn.addEventListener("click", () => setGlassMode(btn.dataset.uimiGlassMode));
+    });
+
+    document.querySelectorAll("[data-uimi-glass-clear]").forEach((btn) => {
+      btn.addEventListener("click", () => clearGlass());
+    });
+
+    modal.querySelectorAll("[data-uimi-glass-bg]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyGlassBg(btn.dataset.uimiGlassBg);
+      });
+    });
+
+    gear.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openGlassModal();
+    });
+
+    modal.querySelector("[data-uimi-glass-drag]")?.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("[data-uimi-glass-close]")) return;
+      const panel = glassPanel();
+      if (!panel) return;
+      event.preventDefault();
+      const rect = panel.getBoundingClientRect();
+      glassDrag = {
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+      };
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+      panel.classList.add("is-dragging");
+    });
+
+    const moveGlassPanel = (event) => {
+      if (!glassDrag) return;
+      placeGlassPanel(event.clientX - glassDrag.offsetX, event.clientY - glassDrag.offsetY);
+    };
+
+    const endGlassDrag = () => {
+      if (!glassDrag) return;
+      glassDrag = null;
+      glassPanel()?.classList.remove("is-dragging");
+    };
+
+    window.addEventListener("pointermove", moveGlassPanel);
+    window.addEventListener("pointerup", endGlassDrag);
+    window.addEventListener("pointercancel", endGlassDrag);
+
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (modal.hidden || glassDrag) return;
+        if (event.target.closest(".uimi-glass-modal__panel, .uimi-glass-gear")) return;
+        closeGlassModal({ revert: true });
+      },
+      true
+    );
+
+    modal.querySelector("[data-uimi-glass-close]")?.addEventListener("click", () => closeGlassModal({ revert: true }));
+
+    modal.querySelector("[data-uimi-glass-apply]")?.addEventListener("click", () => {
+      if (!glassClassKey) return;
+      applyClassGlass(glassClassKey, glassDraft, { persist: true });
+      closeGlassModal({ revert: false });
+    });
+
+    modal.querySelector("[data-uimi-glass-apply-all]")?.addEventListener("click", () => {
+      applyAllGlass(glassDraft, { persist: true });
+      closeGlassModal({ revert: false });
+    });
+
+    modal.querySelector("[data-uimi-glass-remove]")?.addEventListener("click", () => {
+      if (!glassClassKey) return;
+      removeClassGlass(glassClassKey);
+      closeGlassModal({ revert: false });
+    });
+
+    modal.querySelector("[data-uimi-glass-defaults]")?.addEventListener("click", () => {
+      glassDraft = {
+        ...glassDefaults,
+        radius: glassDraft.radius,
+        textColor: glassDraft.textColor,
+      };
+      syncGlassModalFields();
+      livePreviewGlass();
+    });
+
+    modal.querySelectorAll("[data-uimi-glass-preset]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyGlassPreset(btn.dataset.uimiGlassPreset);
+      });
+    });
+
+    modal.querySelectorAll("[data-uimi-glass-param]").forEach((input) => {
+      const sync = () => {
+        const key = input.dataset.uimiGlassParam;
+        if (!key) return;
+        glassDraft[key] = GLASS_COLOR_PARAMS.has(key) ? input.value : Number(input.value);
+        syncGlassModalFields();
+        livePreviewGlass();
+      };
+      input.addEventListener("input", sync);
+      input.addEventListener("change", sync);
+    });
+
+    document.addEventListener("click", selectGlassElement, true);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (!modal.hidden) closeGlassModal({ revert: true });
+        else hideGlassGear();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (glassTarget && !gear.hidden) placeGlassGear(glassTarget);
     });
   }
 
   document.querySelectorAll(".uimi-chart").forEach((chart) => {
-    if (!chart.querySelector("svg")) renderChart(chart);
+    if (!chart.childElementCount) renderChart(chart);
   });
 
   document.querySelectorAll(".uimi-btn--flip").forEach((btn) => {
@@ -1651,6 +3062,19 @@
     text.className = "uimi-btn__flip-text";
     while (shell.firstChild) text.appendChild(shell.firstChild);
     shell.appendChild(text);
+  });
+
+  document.querySelectorAll("[data-uimi-liquid-group]").forEach((group) => {
+    group.addEventListener("click", (event) => {
+      const btn = event.target.closest(".uimi-btn--liquid");
+      if (!btn || !group.contains(btn)) return;
+      group.querySelectorAll(".uimi-btn--liquid").forEach((el) => {
+        el.classList.remove("is-active");
+        el.setAttribute("aria-pressed", "false");
+      });
+      btn.classList.add("is-active");
+      btn.setAttribute("aria-pressed", "true");
+    });
   });
 
   document.querySelectorAll("[data-uimi-pager]").forEach((pager) => {

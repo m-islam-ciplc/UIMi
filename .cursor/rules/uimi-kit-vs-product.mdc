@@ -1,0 +1,76 @@
+---
+description: UIMi is a design kit catalog — never clone authoring chrome or every demo variant into a product app
+alwaysApply: true
+---
+
+# UIMi kit vs product UI
+
+`index.html` is a **preview catalog**, not a finished product. When adapting UIMi into an app (or when another Cursor session uses this repo as a reference), copy **kit pieces**, never the whole demo shell.
+
+## Never copy (authoring / studio chrome)
+
+These are design tools for editing the kit. They are **not** theme UI and must **not** appear in product layouts:
+
+- `.uimi-studio` — Design bar (theme/font/usage selects, Paint, Move, Glass)
+- `.uimi-paint-pop`, `.uimi-glass-gear`, `.uimi-glass-modal` — injected paint/glass editors
+- `.uimi-copy-fab`, `[data-uimi-copy-page]`, `.uimi-snippet`, `.uimi-note` — catalog helpers
+- Anything marked `data-uimi-kit="authoring"`
+
+Theme **controls** (palette / font dropdowns) ≠ the theme itself. The theme is only:
+
+- `uimi.css`
+- `data-uimi-palette`, `data-uimi-font`, `data-uimi-display`, `data-uimi-shell` on `<html>`
+
+## Liquid Glass is not a theme
+
+Do not duplicate palettes into “LG” and “non-LG” themes. Glass is a separate preference (iPhone-like on/off):
+
+- Theme: `data-uimi-palette` / font / shell
+- Glass: `data-uimi-glass="on"` or `"off"` on `<html>`, plus `.uimi-glass` on chosen surfaces when on
+- Same Apricot (or any palette) can power a solid app and a glass app
+
+Studio Off/On + gear + modal = authoring only — never ship those.
+
+**How to choose glass:**
+
+1. User says no glass / solid → `data-uimi-glass="off"`.
+2. User asks for liquid glass → `on` + `.uimi-glass` on chosen surfaces.
+3. Named preset → use it; else if glass wanted → **Regular**.
+4. Glass not mentioned → **Off**. Do not add glass unprompted.
+5. Never apply Regular + Clear + Chrome + Thick together — one preset.
+
+## Catalog shell is also not product
+
+The top navbar / sidebar that lists **Login 1, Login 2, Dashboard 1–3, Buttons…** is catalog navigation. Do not ship it as the product chrome.
+
+**Never ship the UIMi logo.** `.uimi-kit-mark` and `icons/letter-u.png` are kit branding only. Product apps use their own mark inside a plain `.uimi-mark` (or drop the mark). If you paste catalog chrome, strip `data-uimi-kit="catalog"`, `.uimi-kit-mark`, and the “UIMi” wordmark.
+
+## Pick one variant per family (how to choose)
+
+Multiple pages/blocks are **reference options**, not screens to ship together. Never paste Login 1 + Login 2, or every table freeze demo, into one product.
+
+**Decision order:**
+
+1. **User named it** → use that (`login-2`, “freeze header table”, Dashboard 3, pill buttons).
+2. **User did not name it** → ask once, briefly (e.g. “Login 1 or Login 2?”). Do not start building all of them.
+3. **User says pick / defaults / just build** → use the catalog default (`*-1` or the first simple pattern).
+
+| Family | Options | Default if user says “pick” |
+| --- | --- | --- |
+| Login | `login-1`, `login-2` | `login-1` |
+| Dashboard | `dashboard-1`, `dashboard-2`, `dashboard-3` | `dashboard-1` |
+| Buttons | rounded / square / pill / `uimi-btn--oval` (catalog `#buttons` 2×2) | rounded |
+| Tables | plain wrap · freeze-head · freeze-col · freeze-head+cols | plain `.uimi-table-wrap` unless they need sticky scroll |
+| Cards / forms / tabs / … | several demos on one page | first / simplest pattern that matches the job |
+
+Pages: `.uimi-page[data-uimi-page="…"]`. On multi-demo pages (tables, cards), copy **one** block, not the whole page of examples. Prefer Usage/Copy over cloning `index.html`.
+
+## Correct product extract
+
+1. Link / import `uimi.css` (and icons/fonts as needed).
+2. Set theme attrs on `<html>` (or the app root).
+3. Take markup from **one** chosen page / component pattern.
+4. Strip authoring nodes and catalog-only notes/snippets.
+5. Swap demo copy and the UIMi brand for the real product.
+
+If you catch yourself outputting `.uimi-studio`, Paint/Move/Glass controls, or Login 1 **and** Login 2 in the same product screen, stop and remove them.

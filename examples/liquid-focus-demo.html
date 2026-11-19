@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Liquid Focus — demo</title>
+    <style>
+      :root {
+        --lf-ink: #2a2a2e;
+        --lf-muted: #6b6b73;
+        --lf-panel: rgba(255, 255, 255, 0.42);
+        --lf-pill: rgba(255, 255, 255, 0.72);
+        --lf-pill-edge: rgba(255, 255, 255, 0.95);
+        /* Orange — earlier active */
+        --lf-orange: #ff8a3d;
+        --lf-orange-deep: #f06a1a;
+        --lf-orange-glow: rgba(255, 138, 61, 0.55);
+        /* Periwinkle blue — from reference */
+        --lf-blue: #8ea8e8;
+        --lf-blue-mid: #a8bff0;
+        --lf-blue-soft: #d4e0f8;
+        --lf-blue-glow: rgba(120, 150, 220, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--lf-ink);
+        background:
+          radial-gradient(1200px 700px at 18% 12%, #ffffff 0%, transparent 55%),
+          radial-gradient(900px 600px at 88% 18%, #e8eef5 0%, transparent 50%),
+          radial-gradient(800px 500px at 50% 100%, #f3ebe3 0%, transparent 45%),
+          linear-gradient(165deg, #eef1f5 0%, #e4e8ee 48%, #ece7e1 100%);
+      }
+
+      .stage {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1rem;
+      }
+
+      .demos {
+        display: grid;
+        gap: 2.5rem;
+        width: min(100%, 48rem);
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        align-items: start;
+      }
+
+      .demo {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .demo__label {
+        margin: 0;
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 650;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--lf-muted);
+      }
+
+      .focus-panel {
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: 1.85rem;
+        background: var(--lf-panel);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        box-shadow:
+          0 30px 60px rgba(40, 45, 60, 0.12),
+          0 8px 20px rgba(40, 45, 60, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(18px) saturate(1.25);
+        -webkit-backdrop-filter: blur(18px) saturate(1.25);
+        display: grid;
+        gap: 0.7rem;
+      }
+
+      .liquid-pill {
+        position: relative;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 0.85rem;
+        width: 100%;
+        min-height: 3.35rem;
+        padding: 0.7rem 0.95rem;
+        border: 0;
+        border-radius: 999px;
+        font: inherit;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+        color: var(--lf-ink);
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, var(--lf-pill) 45%, rgba(235, 238, 244, 0.78) 100%);
+        box-shadow:
+          0 10px 22px rgba(55, 60, 75, 0.1),
+          0 2px 4px rgba(55, 60, 75, 0.06),
+          inset 0 1.5px 0 var(--lf-pill-edge),
+          inset 0 -1px 0 rgba(180, 185, 200, 0.35);
+        transition:
+          transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.28s ease,
+          background 0.35s ease,
+          color 0.25s ease,
+          filter 0.28s ease;
+      }
+
+      .liquid-pill::before {
+        content: "";
+        position: absolute;
+        inset: 1px 10% auto;
+        height: 42%;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), transparent);
+        pointer-events: none;
+        opacity: 0.9;
+      }
+
+      .liquid-pill:hover {
+        transform: translateY(-2px) scale(1.015);
+      }
+
+      .liquid-pill:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      /* —— Orange active (older) —— */
+      .liquid-pill.is-active--orange {
+        color: #fff;
+        background:
+          radial-gradient(120% 140% at 50% 0%, #ffc08a 0%, transparent 55%),
+          linear-gradient(180deg, #ffb06a 0%, var(--lf-orange) 42%, var(--lf-orange-deep) 100%);
+        box-shadow:
+          0 14px 30px var(--lf-orange-glow),
+          0 4px 10px rgba(240, 106, 26, 0.35),
+          inset 0 1.5px 0 rgba(255, 230, 200, 0.85),
+          inset 0 -2px 4px rgba(180, 60, 0, 0.2);
+        filter: saturate(1.08);
+      }
+
+      .liquid-pill.is-active--orange .liquid-pill__more:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      /* —— Periwinkle blue active (new) —— */
+      .liquid-pill.is-active--blue {
+        color: var(--lf-ink);
+        background:
+          radial-gradient(90% 140% at 0% 50%, var(--lf-blue) 0%, transparent 58%),
+          linear-gradient(
+            100deg,
+            var(--lf-blue) 0%,
+            var(--lf-blue-mid) 38%,
+            var(--lf-blue-soft) 72%,
+            rgba(255, 255, 255, 0.92) 100%
+          );
+        box-shadow:
+          0 14px 32px var(--lf-blue-glow),
+          0 4px 10px rgba(100, 130, 200, 0.28),
+          inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+          inset 0 -2px 4px rgba(90, 120, 190, 0.18);
+      }
+
+      .liquid-pill.is-active--blue .liquid-pill__more:hover {
+        background: rgba(0, 0, 0, 0.06);
+      }
+
+      .liquid-pill__icon,
+      .liquid-pill__more {
+        display: grid;
+        place-items: center;
+        width: 1.35rem;
+        height: 1.35rem;
+        opacity: 0.92;
+      }
+
+      .liquid-pill__label {
+        text-align: left;
+        line-height: 1;
+      }
+
+      .liquid-pill__more {
+        border: 0;
+        background: transparent;
+        border-radius: 999px;
+        color: inherit;
+        cursor: pointer;
+        opacity: 0.7;
+        padding: 0;
+      }
+
+      .liquid-pill__more:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.06);
+      }
+
+      .hint {
+        margin: 0;
+        text-align: center;
+        color: var(--lf-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      .swatches {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+      }
+
+      .swatch {
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      .swatch--blue {
+        background: linear-gradient(100deg, #8ea8e8, #d4e0f8);
+      }
+
+      .swatch--orange {
+        background: linear-gradient(180deg, #ffb06a, #f06a1a);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <div class="demos">
+        <section class="demo" data-accent="blue">
+          <p class="demo__label">Periwinkle blue</p>
+          <div class="focus-panel" role="listbox" aria-label="Focus modes blue">
+            <button class="liquid-pill is-active--blue" type="button" role="option" aria-selected="true" data-mode="sleep">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 18V10a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8" />
+                  <path d="M15 12h4a2 2 0 0 1 2 2v4" />
+                  <path d="M2 18h20" />
+                  <path d="M7 8V6a2 2 0 0 1 2-2h2" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Sleep</span>
+              <span class="liquid-pill__more" aria-label="Sleep options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+
+            <button class="liquid-pill" type="button" role="option" data-mode="dnd">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 7 7 0 1 0 20.5 14.5z" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Do Not Disturb</span>
+              <span class="liquid-pill__more" aria-label="Do Not Disturb options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+
+            <button class="liquid-pill" type="button" role="option" data-mode="personal">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="3.2" />
+                  <path d="M5.5 19.5c1.6-3.2 3.9-4.8 6.5-4.8s4.9 1.6 6.5 4.8" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Personal</span>
+              <span class="liquid-pill__more" aria-label="Personal options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+          </div>
+          <div class="swatches" aria-hidden="true"><span class="swatch swatch--blue"></span></div>
+          <p class="hint">#8ea8e8 → #d4e0f8</p>
+        </section>
+
+        <section class="demo" data-accent="orange">
+          <p class="demo__label">Orange</p>
+          <div class="focus-panel" role="listbox" aria-label="Focus modes orange">
+            <button class="liquid-pill" type="button" role="option" data-mode="sleep">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 18V10a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8" />
+                  <path d="M15 12h4a2 2 0 0 1 2 2v4" />
+                  <path d="M2 18h20" />
+                  <path d="M7 8V6a2 2 0 0 1 2-2h2" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Sleep</span>
+              <span class="liquid-pill__more" aria-label="Sleep options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+
+            <button class="liquid-pill" type="button" role="option" data-mode="dnd">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 7 7 0 1 0 20.5 14.5z" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Do Not Disturb</span>
+              <span class="liquid-pill__more" aria-label="Do Not Disturb options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+
+            <button class="liquid-pill is-active--orange" type="button" role="option" aria-selected="true" data-mode="personal">
+              <span class="liquid-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="3.2" />
+                  <path d="M5.5 19.5c1.6-3.2 3.9-4.8 6.5-4.8s4.9 1.6 6.5 4.8" />
+                </svg>
+              </span>
+              <span class="liquid-pill__label">Personal</span>
+              <span class="liquid-pill__more" aria-label="Personal options" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+              </span>
+            </button>
+          </div>
+          <div class="swatches" aria-hidden="true"><span class="swatch swatch--orange"></span></div>
+          <p class="hint">#ff8a3d → #f06a1a</p>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      document.querySelectorAll(".demo").forEach((demo) => {
+        const accent = demo.dataset.accent;
+        const activeClass = accent === "blue" ? "is-active--blue" : "is-active--orange";
+        const pills = [...demo.querySelectorAll(".liquid-pill")];
+        pills.forEach((pill) => {
+          pill.addEventListener("click", (e) => {
+            if (e.target.closest(".liquid-pill__more")) {
+              e.stopPropagation();
+              return;
+            }
+            pills.forEach((p) => {
+              p.classList.remove("is-active--blue", "is-active--orange");
+              p.removeAttribute("aria-selected");
+            });
+            pill.classList.add(activeClass);
+            pill.setAttribute("aria-selected", "true");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

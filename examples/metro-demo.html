@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  data-uimi-palette="midnight"
+  data-uimi-font="inter"
+  data-uimi-display="inter"
+  data-uimi-shell="navbar"
+  data-uimi-glass="off"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UIMi · Metro elements</title>
+    <link rel="stylesheet" href="../uimi.css" />
+    <style>
+      /* Metro/Bauhaus experiment — page-scoped restyle of real UIMi components */
+      .metro {
+        --metro-accent: #009be2;
+        --metro-line: color-mix(in srgb, #ffffff 18%, transparent);
+        --metro-muted: color-mix(in srgb, #ffffff 68%, transparent);
+        min-height: 100vh;
+        margin: 0;
+        background: #0b0b0b;
+        color: #fff;
+      }
+
+      .metro__shell {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 24px 72px;
+        display: grid;
+        gap: 28px;
+      }
+
+      .metro__eyebrow {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--metro-muted);
+      }
+
+      .metro__title {
+        margin: 4px 0 0;
+        font-size: clamp(32px, 6vw, 48px);
+        font-weight: 200;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      .metro__lede {
+        margin: 8px 0 0;
+        max-width: 48ch;
+        color: var(--metro-muted);
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      .metro__section-label {
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--metro-muted);
+      }
+
+      .metro .uimi-card {
+        border-radius: 0;
+        border: 1px solid var(--metro-line);
+        box-shadow: none;
+        background: #141414;
+        color: #fff;
+      }
+
+      .metro .uimi-card h3 {
+        margin: 0 0 4px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .metro .uimi-muted {
+        color: var(--metro-muted);
+      }
+
+      .metro .uimi-btn {
+        border-radius: 0;
+        box-shadow: none;
+        font-weight: 600;
+      }
+
+      .metro .uimi-btn--primary,
+      .metro .uimi-btn--primary.uimi-btn--solid {
+        background: var(--metro-accent);
+        border-color: var(--metro-accent);
+        color: #fff;
+      }
+
+      .metro .uimi-btn--ghost,
+      .metro .uimi-btn--border {
+        background: transparent;
+        border: 2px solid color-mix(in srgb, #fff 40%, transparent);
+        color: #fff;
+      }
+
+      .metro .uimi-btn--danger.uimi-btn--solid {
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .metro .uimi-btn--success.uimi-btn--solid,
+      .metro .uimi-btn--info.uimi-btn--solid,
+      .metro .uimi-btn--warning.uimi-btn--solid,
+      .metro .uimi-btn--solid {
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .metro .uimi-table-wrap {
+        border-radius: 0;
+        border: 1px solid var(--metro-line);
+        box-shadow: none;
+        background: #111;
+      }
+
+      .metro .uimi-table {
+        color: #fff;
+      }
+
+      .metro .uimi-table th {
+        border-bottom: 1px solid var(--metro-line);
+        color: var(--metro-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        background: transparent;
+      }
+
+      .metro .uimi-table td {
+        border-bottom: 1px solid var(--metro-line);
+      }
+
+      .metro .uimi-table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .metro .uimi-progress {
+        border-radius: 0;
+        background: color-mix(in srgb, #fff 12%, transparent);
+      }
+
+      .metro .uimi-progress span {
+        border-radius: 0;
+        background: var(--metro-accent);
+      }
+
+      .metro .uimi-progress--green span {
+        background: #018282;
+      }
+
+      .metro .uimi-progress--navy span {
+        background: #3b4a9c;
+      }
+
+      .metro .uimi-avatar {
+        border-radius: 0;
+      }
+
+      .metro__note {
+        margin: 0;
+        max-width: 56ch;
+        font-size: 12px;
+        line-height: 1.45;
+        color: var(--metro-muted);
+      }
+
+      .metro__note a {
+        color: #fff;
+      }
+
+      .metro__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 720px) {
+        .metro__grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="uimi-body metro">
+    <main class="metro__shell">
+      <header>
+        <p class="metro__eyebrow">UIMi experiment · Bauhaus / Metro</p>
+        <h1 class="metro__title">Your elements</h1>
+        <p class="metro__lede">
+          Same UIMi buttons, cards, and table — flat, sharp edges, no glass or soft shadow.
+        </p>
+      </header>
+
+      <section>
+        <p class="metro__section-label">Buttons</p>
+        <div class="uimi-cluster">
+          <button class="uimi-btn uimi-btn--primary uimi-btn--solid" type="button">Save</button>
+          <button class="uimi-btn uimi-btn--info uimi-btn--solid" type="button">Invite</button>
+          <button class="uimi-btn uimi-btn--success uimi-btn--solid" type="button">Approve</button>
+          <button class="uimi-btn uimi-btn--warning uimi-btn--solid" type="button">Hold</button>
+          <button class="uimi-btn uimi-btn--danger uimi-btn--solid" type="button">Delete</button>
+          <button class="uimi-btn uimi-btn--ghost" type="button">Cancel</button>
+        </div>
+      </section>
+
+      <section>
+        <p class="metro__section-label">Cards</p>
+        <div class="metro__grid">
+          <article class="uimi-card">
+            <h3>Open invoices</h3>
+            <p class="uimi-muted">12 waiting for review</p>
+            <p style="margin:16px 0 0;font-size:36px;font-weight:200;letter-spacing:-0.03em">$48,200</p>
+            <div class="uimi-cluster" style="margin-top:16px">
+              <button class="uimi-btn uimi-btn--primary uimi-btn--solid" type="button">Review</button>
+              <button class="uimi-btn uimi-btn--ghost" type="button">Export</button>
+            </div>
+          </article>
+          <article class="uimi-card">
+            <h3>Team capacity</h3>
+            <p class="uimi-muted">This sprint</p>
+            <p style="margin:16px 0 8px;font-size:36px;font-weight:200;letter-spacing:-0.03em">76%</p>
+            <div class="uimi-progress uimi-progress--navy"><span style="width:76%"></span></div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <p class="metro__section-label">Table</p>
+        <article class="uimi-card">
+          <h3>Accounts</h3>
+          <p class="uimi-muted">Teams and completion in one grid</p>
+          <div class="uimi-table-wrap" style="margin-top:16px">
+            <table class="uimi-table">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Team</th>
+                  <th>Budget</th>
+                  <th>Completion</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="uimi-who"><span class="uimi-avatar">NW</span> Northwind ERP</span></td>
+                  <td>8</td>
+                  <td>$14,000</td>
+                  <td>
+                    <div class="uimi-progress uimi-progress--navy"><span style="width:60%"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="uimi-who"><span class="uimi-avatar">CT</span> Contoso migration</span></td>
+                  <td>5</td>
+                  <td>$3,000</td>
+                  <td>
+                    <div class="uimi-progress"><span style="width:10%"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="uimi-who"><span class="uimi-avatar">AC</span> Acme finance close</span></td>
+                  <td>12</td>
+                  <td>$20,500</td>
+                  <td>
+                    <div class="uimi-progress uimi-progress--green"><span style="width:100%"></span></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <p class="metro__note">
+        Branch <code>bauhaus-dev</code> only · page-local CSS on Midnight ·
+        <a href="../index.html">catalog</a>
+      </p>
+    </main>
+  </body>
+</html>
