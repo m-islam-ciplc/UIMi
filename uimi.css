@@ -2239,6 +2239,78 @@ html:not([data-uimi-session="in"]) .uimi-signout {
   font-size: 11px;
 }
 
+/* Product theme switcher — copy into apps (not studio authoring) */
+.uimi-theme {
+  position: relative;
+}
+
+.uimi-theme-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: min(200px, calc(100vw - 32px));
+  padding: 6px;
+  border: 1px solid var(--uimi-line);
+  border-radius: var(--uimi-radius);
+  background: var(--uimi-surface);
+  box-shadow: var(--uimi-shadow);
+  color: var(--uimi-ink);
+}
+
+.uimi-theme-head {
+  padding: 6px 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.uimi-theme-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px;
+  border: 0;
+  border-radius: var(--uimi-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.uimi-theme-choice:hover,
+.uimi-theme-choice[aria-pressed="true"] {
+  background: var(--uimi-bg);
+}
+
+.uimi-theme-swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--uimi-ink) 18%, transparent);
+}
+
+.uimi-theme-choice[data-uimi-theme-choice="apricot"] .uimi-theme-swatch {
+  background: #e07a5f;
+}
+
+.uimi-theme-choice[data-uimi-theme-choice="midnight"] .uimi-theme-swatch {
+  background: #1e293b;
+}
+
+.uimi-theme-choice[data-uimi-theme-choice="pastel"] .uimi-theme-swatch {
+  background: #e8a598;
+}
+
+.uimi-theme-choice[data-uimi-theme-choice="lavender-mist"] .uimi-theme-swatch {
+  background: #886cc0;
+}
+
 .uimi-icon-btn:hover,
 .uimi-icon-btn[aria-checked="true"] {
   color: var(--uimi-ink);
@@ -3570,11 +3642,13 @@ html:not([data-uimi-session="in"]) .uimi-signout {
   flex: none;
 }
 
-.uimi-navbar .uimi-who {
+.uimi-navbar .uimi-who,
+.uimi-topbar .uimi-who {
   gap: 0;
 }
 
-.uimi-navbar .uimi-who-name {
+.uimi-navbar .uimi-who-name,
+.uimi-topbar .uimi-who-name {
   display: none;
 }
 

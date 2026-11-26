@@ -27,6 +27,10 @@
     document.querySelectorAll("[data-uimi-palette-select]").forEach((select) => {
       select.value = next;
     });
+    document.querySelectorAll("[data-uimi-theme-choice]").forEach((button) => {
+      const on = button.getAttribute("data-uimi-theme-choice") === next;
+      button.setAttribute("aria-pressed", String(on));
+    });
     // Only wipe paint/move when the user switches themes — not on every page load.
     // Glass mode is independent of palette (like iPhone LG on/off) — keep map, sync backdrop.
     if (!changed) return;
@@ -227,6 +231,20 @@
     });
   };
 
+  const closeTheme = () => {
+    document.querySelectorAll(".uimi-theme-panel").forEach((panel) => {
+      panel.hidden = true;
+    });
+    document.querySelectorAll("[data-uimi-theme-toggle]").forEach((button) => {
+      button.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  const closeChromeMenus = () => {
+    closeNotify();
+    closeTheme();
+  };
+
   const showPage = (id) => {
     const next = pages.includes(id) ? id : pageFromHash();
     root.setAttribute("data-uimi-session", readSession() ? "in" : "out");
@@ -242,7 +260,7 @@
     document.querySelectorAll(".uimi-navbar-links .uimi-nav-sub").forEach((group) => {
       group.open = false;
     });
-    closeNotify();
+    closeChromeMenus();
     app?.classList.remove("is-open");
     window.scrollTo(0, 0);
     document.title = pageLabels[next] || "Console";
@@ -321,13 +339,36 @@
     button.addEventListener("click", (event) => {
       event.stopPropagation();
       const open = panel.hidden;
-      closeNotify();
+      closeChromeMenus();
       if (open) {
         panel.hidden = false;
         button.setAttribute("aria-expanded", "true");
       }
     });
     panel.addEventListener("click", (event) => event.stopPropagation());
+  });
+
+  document.querySelectorAll(".uimi-theme").forEach((root) => {
+    const button = root.querySelector("[data-uimi-theme-toggle]");
+    const panel = root.querySelector(".uimi-theme-panel");
+    if (!button || !panel) return;
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const open = panel.hidden;
+      closeChromeMenus();
+      if (open) {
+        panel.hidden = false;
+        button.setAttribute("aria-expanded", "true");
+      }
+    });
+    panel.addEventListener("click", (event) => event.stopPropagation());
+  });
+
+  document.querySelectorAll("[data-uimi-theme-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      applyPalette(button.getAttribute("data-uimi-theme-choice"));
+      closeTheme();
+    });
   });
 
   const eventFrom = (event) => {
@@ -338,10 +379,12 @@
   };
 
   document.addEventListener("click", (event) => {
-    if (!eventFrom(event)?.closest(".uimi-notify")) closeNotify();
+    const from = eventFrom(event);
+    if (!from?.closest(".uimi-notify")) closeNotify();
+    if (!from?.closest(".uimi-theme")) closeTheme();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeNotify();
+    if (event.key === "Escape") closeChromeMenus();
   });
 
   const chartTypes = ["bar", "hbar", "grouped", "line", "area", "spark", "donut", "pie", "gauge", "stacked"];

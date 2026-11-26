@@ -83,6 +83,8 @@ Themes are palette + type + shell — not Liquid Glass.
 
 Same palette can power many apps.
 
+**End-user theme switcher (product UI):** copy the palette icon menu from the catalog chrome (`.uimi-theme`). It is shippable — not the Design bar. Clicking a theme sets `data-uimi-palette` and remembers it.
+
 ---
 
 ## Liquid Glass (optional)
